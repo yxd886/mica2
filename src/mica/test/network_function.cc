@@ -2,6 +2,7 @@
 #include "mica/util/lcore.h"
 #include "mica/util/hash.h"
 #include "mica/util/zipf.h"
+#include "mica/network/dpdk.h"
 #include <vector>
 
 typedef ::mica::alloc::HugeTLBFS_SHM Alloc;
@@ -53,12 +54,44 @@ public:
 	uint16_t _dst_port;
 };
 
+
+struct rte_ring_item{
+	uint64_t _key_hash;
+	size_t _key_length;
+	char* _key;
+
+  rte_ring_item(uint64_t key_hash,
+  							  size_t key_length,
+								char* key
+             ) :
+            	 _key_hash(key_hash),
+							 _key_length(key_length),
+							 _key(key)
+               {}
+};
+
+struct fivetuple{
+public:
+	fivetuple(uint32_t src_addr,uint32_t dst_addr,uint16_t src_port,uint16_t dst_port,uint8_t next_proto_id):
+		_src_addr(src_addr),_dst_addr(dst_addr),_src_port(src_port),_dst_port(dst_port),_next_proto_id(next_proto_id){
+
+	}
+
+	uint32_t _src_addr;
+	uint32_t _dst_addr;
+	uint16_t _src_port;
+	uint16_t _dst_port;
+	uint8_t _next_proto_id;
+
+};
+
 struct session_state{
 
 };
 class Firewall{
 public:
-	Firewall(){
+	Firewall(struct rte_ring** worker2intface,struct rte_ring** interface2worker):
+		_worker2intface(worker2intface),_interface2worker(interface2worker){
 
 	  auto rules_config = ::mica::util::Config::load_file("firewall.json").get("rules");
 	  for (size_t i = 0; i < rules_config.size(); i++) {
@@ -79,8 +112,43 @@ public:
 	  }
 
 	}
+	void process_packet(struct rte_mbuf* rte_pkt){
+
+		struct ipv4_hdr *iphdr;
+		struct tcp_hdr *tcp;
+		iphdr = rte_pktmbuf_mtod_offset(rte_pkt,
+                                       struct ipv4_hdr *,
+                                       sizeof(struct ether_hdr));
+
+    switch (iphdr->next_proto_id) {
+    case IPPROTO_TCP:
+            tcp = (struct tcp_hdr *)((unsigned char *)ipv4_hdr +
+                                    sizeof(struct ipv4_hdr));
+
+            struct fivetuple tuple(iphdr->src_addr,iphdr->dst_addr,tcp->src_port,tcp->dst_port,iphdr->next_proto_id);
+            char* key = reinterpret_cast<char*>(&tuple);
+            size_t key_length = sizeof(tuple);
+            uint64_t key_hash= hash(key, key_length);
+            struct ret_ring_item item(key_hash,key_length,key);
+            rte_ring_enqueue(_worker2intface[rte_lcore_id()],static_cast<void*>(&item));
+
+
+
+            break;
+    case IPPROTO_UDP:
+
+            break;
+    default:
+
+            break;
+    }
+
+
+	}
 
 	std::vector<rule> rules;
+	struct rte_ring** _worker2intface;
+	struct rte_ring** _interface2worker;
 
 };
 
@@ -91,6 +159,15 @@ struct Args {
   Client* client;
   double zipf_theta;
 } __attribute__((aligned(128)));
+
+
+int data_store_client_interface(){
+	while(true){
+
+
+
+	}
+}
 
 int worker_proc(void* arg) {
   auto args = reinterpret_cast<Args*>(arg);
@@ -177,46 +254,5 @@ int worker_proc(void* arg) {
 }
 
 int main(int argc, const char* argv[]) {
-  if (argc != 2) {
-    printf("%s ZIPF-THETA\n", argv[0]);
-    return EXIT_FAILURE;
-  }
-
-  double zipf_theta = atof(argv[1]);
-
-  ::mica::util::lcore.pin_thread(0);
-
-  auto config = ::mica::util::Config::load_file("netbench.json");
-
-  Alloc alloc(config.get("alloc"));
-
-  DatagramClientConfig::Network network(config.get("network"));
-  network.start();
-
-  Client::DirectoryClient dir_client(config.get("dir_client"));
-
-  Client client(config.get("client"), &network, &dir_client);
-  client.discover_servers();
-
-  uint16_t lcore_count =
-      static_cast<uint16_t>(::mica::util::lcore.lcore_count());
-
-  std::vector<Args> args(lcore_count);
-  for (uint16_t lcore_id = 0; lcore_id < lcore_count; lcore_id++) {
-    args[lcore_id].lcore_id = lcore_id;
-    args[lcore_id].config = &config;
-    args[lcore_id].alloc = &alloc;
-    args[lcore_id].client = &client;
-    args[lcore_id].zipf_theta = zipf_theta;
-  }
-
-  for (uint16_t lcore_id = 1; lcore_id < lcore_count; lcore_id++) {
-    if (!rte_lcore_is_enabled(static_cast<uint8_t>(lcore_id))) continue;
-    rte_eal_remote_launch(worker_proc, &args[lcore_id], lcore_id);
-  }
-  worker_proc(&args[0]);
-
-  network.stop();
-
-  return EXIT_SUCCESS;
+	return 0;
 }
