@@ -4,7 +4,7 @@
 #include "mica/util/zipf.h"
 #include "mica/network/dpdk.h"
 #include <vector>
-#include <stdio>
+#include <iostream>
 
 typedef ::mica::alloc::HugeTLBFS_SHM Alloc;
 
