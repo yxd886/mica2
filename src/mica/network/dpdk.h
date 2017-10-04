@@ -10,6 +10,7 @@
 #include <rte_common.h>
 #include <rte_eal.h>
 #include <rte_ethdev.h>
+#include <rte_tcp.h>
 #include <rte_eth_ctrl.h>
 #include <rte_log.h>
 #include <rte_errno.h>
