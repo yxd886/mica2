@@ -1,0 +1,15 @@
+{
+
+    "rules": [
+      {"src_addr": 0, "dst_addr": "10.0.1.1", "src_port": 0, "dst_port": 0},
+      {"src_addr": 1, "dst_addr": "10.0.1.2", "src_port": 0, "dst_port": 0},
+      {"src_addr": 2, "dst_addr": "10.0.1.3", "src_port": 0, "dst_port": 0},
+      {"src_addr": 3, "dst_addr": "10.0.1.4", "src_port": 0, "dst_port": 0},
+      {"src_addr": 4, "dst_addr": "10.0.1.5", "src_port": 0, "dst_port": 0},
+      {"src_addr": 5, "dst_addr": "10.0.1.6", "src_port": 0, "dst_port": 0},
+      {"src_addr": 6, "dst_addr": "10.0.1.7", "src_port": 0, "dst_port": 0},
+      {"src_addr": 7, "dst_addr": "10.0.1.8", "src_port": 0, "dst_port": 0}
+    ]
+
+
+}
