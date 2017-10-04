@@ -4,6 +4,7 @@
 #include "mica/util/zipf.h"
 #include "mica/network/dpdk.h"
 #include <vector>
+#include <stdio>
 
 typedef ::mica::alloc::HugeTLBFS_SHM Alloc;
 
@@ -56,11 +57,18 @@ public:
 
 };
 
+struct session_state{
+	bool _connected;
+	session_state(bool connected):_connected(connected){}
+
+};
 
 struct rte_ring_item{
 	uint64_t _key_hash;
 	size_t _key_length;
 	char* _key;
+	struct session_state _state;
+
 
   rte_ring_item(uint64_t key_hash,
   							  size_t key_length,
@@ -68,9 +76,40 @@ struct rte_ring_item{
              ) :
             	 _key_hash(key_hash),
 							 _key_length(key_length),
-							 _key(key)
+							 _key(key),
+							 _state(false)
                {}
 };
+
+
+
+void* poll_interface2worker_ring(struct rte_ring* interface2worker_ring){
+  int aggressive_poll_attemps = 50;
+  int flag = 0;
+  void* dequeue_output[1];
+
+  for(int i=0; i<aggressive_poll_attemps; i++){
+    flag = rte_ring_sc_dequeue(interface2worker_ring, dequeue_output);
+
+    if(flag != 0){
+      continue;
+    }
+    else{
+      return dequeue_output[0];
+    }
+  }
+
+  for(;;){
+    flag = rte_ring_sc_dequeue(interface2worker_ring, dequeue_output);
+
+    if(flag != 0){
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    else{
+      return dequeue_output[0];
+    }
+  }
+}
 
 struct fivetuple{
 public:
@@ -89,13 +128,11 @@ public:
 
 };
 
-struct session_state{
 
-};
 class Firewall{
 public:
-	Firewall(struct rte_ring** worker2intface,struct rte_ring** interface2worker):
-		_worker2intface(worker2intface),_interface2worker(interface2worker){
+	Firewall(struct rte_ring** worker2interface,struct rte_ring** interface2worker):
+		_worker2interface(worker2interface),_interface2worker(interface2worker){
 
 	  auto rules_config = ::mica::util::Config::load_file("firewall.json").get("rules");
 	  for (size_t i = 0; i < rules_config.size(); i++) {
@@ -120,6 +157,9 @@ public:
 
 		struct ipv4_hdr *iphdr;
 		struct tcp_hdr *tcp;
+    unsigned lcore_id;
+
+    lcore_id = rte_lcore_id();
 		iphdr = rte_pktmbuf_mtod_offset(rte_pkt,
                                        struct ipv4_hdr *,
                                        sizeof(struct ether_hdr));
@@ -136,7 +176,19 @@ public:
 			uint64_t key_hash;
 			key_hash= hash(key, key_length);
 			struct rte_ring_item item(key_hash,key_length,key);
-			rte_ring_enqueue(_worker2intface[rte_lcore_id()],static_cast<void*>(&item));
+			rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
+			void* rev_item;
+			rev_item=poll_interface2worker_ring(_interface2worker[lcore_id]);
+			if(rev_item==nullptr){
+				//new session
+
+
+			}else{
+
+
+
+			}
+
 
 
 
@@ -147,7 +199,7 @@ public:
 	}
 
 	std::vector<rule> rules;
-	struct rte_ring** _worker2intface;
+	struct rte_ring** _worker2interface;
 	struct rte_ring** _interface2worker;
 
 };
