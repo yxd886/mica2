@@ -29,7 +29,7 @@ static uint64_t hash(const T* key, size_t key_length) {
   return ::mica::util::hash(key, key_length);
 }
 
-class ResponseHandler
+/*class ResponseHandler
     : public ::mica::datagram::ResponseHandlerInterface<Client> {
  public:
   void handle(Client::RequestDescriptor rd, Result result, const char* value,
@@ -41,7 +41,7 @@ class ResponseHandler
 
   const char* _value;
   size_t _value_length;
-};
+};*/
 
 struct rule{
 public:
