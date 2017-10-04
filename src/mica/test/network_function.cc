@@ -68,9 +68,9 @@ public:
 	    uint16_t dst_port = ::mica::util::safe_cast<uint16_t>(
 	    		rule_conf.get("dst_port").get_uint64());
 
-	    uint32_t src_addr = NetworkAddress::parse_ipv4_addr(
+	    uint32_t src_addr = ::mica::network::NetworkAddress::parse_ipv4_addr(
 	    		rule_conf.get("src_addr").get_str().c_str());
-	    uint32_t dst_addr = NetworkAddress::parse_ipv4_addr(
+	    uint32_t dst_addr = ::mica::network::NetworkAddress::parse_ipv4_addr(
 	    		rule_conf.get("dst_addr").get_str().c_str());
 	    struct rule r(src_addr,dst_addr,src_port,dst_port);
 	    rules.push_back(r);
@@ -84,10 +84,40 @@ public:
 
 };
 
-int worker_proc(void* arg) {
+struct Args {
+  uint16_t lcore_id;
+  ::mica::util::Config* config;
+  Alloc* alloc;
+  Client* client;
+  double zipf_theta;
+} __attribute__((aligned(128)));
 
+int worker_proc(void* arg) {
+  auto args = reinterpret_cast<Args*>(arg);
+
+  Client& client = *args->client;
+
+  ::mica::util::lcore.pin_thread(args->lcore_id);
+
+  printf("worker running on lcore %" PRIu16 "\n", args->lcore_id);
+
+  client.probe_reachability();
 
   ResponseHandler rh;
+
+  size_t num_items = 192 * 1048576;
+
+  // double get_ratio = 0.95;
+  double get_ratio = 0.50;
+
+  uint32_t get_threshold = (uint32_t)(get_ratio * (double)((uint32_t)-1));
+
+  ::mica::util::Rand op_type_rand(static_cast<uint64_t>(args->lcore_id) + 1000);
+  ::mica::util::ZipfGen zg(num_items, args->zipf_theta,
+                           static_cast<uint64_t>(args->lcore_id));
+  ::mica::util::Stopwatch sw;
+  sw.init_start();
+  sw.init_end();
 
   uint64_t key_i;
   uint64_t key_hash;
