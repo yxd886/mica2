@@ -204,7 +204,7 @@ public:
 
 };
 
-struct Args {
+/*struct Args {
   uint16_t lcore_id;
   ::mica::util::Config* config;
   Alloc* alloc;
@@ -304,7 +304,7 @@ int worker_proc(void* arg) {
 
   return 0;
 }
-
+*/
 int main(int argc, const char* argv[]) {
 	return 0;
 }
