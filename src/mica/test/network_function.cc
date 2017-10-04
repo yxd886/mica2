@@ -44,14 +44,16 @@ class ResponseHandler
 
 struct rule{
 public:
-	rule(uint32_t src_addr,uint32_t dst_addr,uint16_t src_port,uint16_t dst_port):
-		_src_addr(src_addr),_dst_addr(dst_addr),_src_port(src_port),_dst_port(dst_port){
 
-	}
 	uint32_t _src_addr;
 	uint32_t _dst_addr;
 	uint16_t _src_port;
 	uint16_t _dst_port;
+	rule(uint32_t src_addr,uint32_t dst_addr,uint16_t src_port,uint16_t dst_port):
+		_src_addr(src_addr),_dst_addr(dst_addr),_src_port(src_port),_dst_port(dst_port){
+
+	}
+
 };
 
 
@@ -72,16 +74,18 @@ struct rte_ring_item{
 
 struct fivetuple{
 public:
-	fivetuple(uint32_t src_addr,uint32_t dst_addr,uint16_t src_port,uint16_t dst_port,uint8_t next_proto_id):
-		_src_addr(src_addr),_dst_addr(dst_addr),_src_port(src_port),_dst_port(dst_port),_next_proto_id(next_proto_id){
 
-	}
 
 	uint32_t _src_addr;
 	uint32_t _dst_addr;
 	uint16_t _src_port;
 	uint16_t _dst_port;
 	uint8_t _next_proto_id;
+	fivetuple(uint32_t src_addr,uint32_t dst_addr,uint16_t src_port,uint16_t dst_port,uint8_t next_proto_id):
+		_src_addr(src_addr),_dst_addr(dst_addr),_src_port(src_port),_dst_port(dst_port),_next_proto_id(next_proto_id){
+
+	}
+
 
 };
 
@@ -120,27 +124,23 @@ public:
                                        struct ipv4_hdr *,
                                        sizeof(struct ether_hdr));
 
-    switch (iphdr->next_proto_id) {
-    case IPPROTO_TCP:
-            tcp = (struct tcp_hdr *)((unsigned char *)ipv4_hdr +
-                                    sizeof(struct ipv4_hdr));
+    if (iphdr->next_proto_id==IPPROTO_TCP) {
 
-            struct fivetuple tuple(iphdr->src_addr,iphdr->dst_addr,tcp->src_port,tcp->dst_port,iphdr->next_proto_id);
-            char* key = reinterpret_cast<char*>(&tuple);
-            size_t key_length = sizeof(tuple);
-            uint64_t key_hash= hash(key, key_length);
-            struct ret_ring_item item(key_hash,key_length,key);
-            rte_ring_enqueue(_worker2intface[rte_lcore_id()],static_cast<void*>(&item));
+			tcp = (struct tcp_hdr *)((unsigned char *)iphdr +
+															sizeof(struct ipv4_hdr));
+
+			struct fivetuple tuple(iphdr->src_addr,iphdr->dst_addr,tcp->src_port,tcp->dst_port,iphdr->next_proto_id);
+			char* key = reinterpret_cast<char*>(&tuple);
+			size_t key_length;
+			key_length= sizeof(tuple);
+			uint64_t key_hash;
+			key_hash= hash(key, key_length);
+			struct rte_ring_item item(key_hash,key_length,key);
+			rte_ring_enqueue(_worker2intface[rte_lcore_id()],static_cast<void*>(&item));
 
 
 
-            break;
-    case IPPROTO_UDP:
 
-            break;
-    default:
-
-            break;
     }
 
 
