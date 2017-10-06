@@ -78,7 +78,6 @@ public:
         }else{
 
             tcp = (struct tcp_hdr *)((unsigned char *)iphdr +sizeof(struct ipv4_hdr));
-            uint32_t server=0;
             char* key=nullptr;
             size_t key_length;
             uint64_t key_hash;
