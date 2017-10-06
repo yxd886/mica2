@@ -27,6 +27,29 @@ struct firewall_state{
 
 };
 
+struct server_load{
+    uint32_t _ip_addr;
+    uint32_t current_load;
+    server_load():_ip_addr(0),current_load(0){}
+};
+
+struct load_balancer_state{
+    uint32_t _dst_ip_addr;
+    uint64_t _backend_list;
+
+    load_balancer_state():_dst_ip_addr(0),_backend_list(0){
+
+    }
+
+    void copy(struct load_balancer_state* c){
+        _dst_ip_addr=c->_dst_ip_addr;
+        _backend_list=c->_backend_list;
+
+    }
+
+
+};
+
 
 
 struct session_state{
@@ -34,7 +57,8 @@ struct session_state{
 
     //firewall state:
     struct firewall_state _firewall_state;
-    session_state():_action(READ),_firewall_state(){}
+    struct load_balancer_state _load_balancer_state;
+    session_state():_action(READ),_firewall_state(),_load_balancer_state(){}
 
 };
 
