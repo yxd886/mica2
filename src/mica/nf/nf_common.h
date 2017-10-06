@@ -8,6 +8,7 @@
 #include "mica/util/hash.h"
 #include "mica/util/zipf.h"
 #include "mica/network/dpdk.h"
+#include "mica/nf/firewall.h"
 #include <vector>
 #include <iostream>
 
@@ -53,7 +54,7 @@ public:
 
 
 
-struct firewall_state;
+
 
 struct session_state{
 	uint32_t _action;
