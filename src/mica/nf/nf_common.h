@@ -8,12 +8,11 @@
 #include "mica/util/hash.h"
 #include "mica/util/zipf.h"
 #include "mica/network/dpdk.h"
-#include "mica/nf/firewall.h"
+#include "mica/nf/nf_state.h"
 #include <vector>
 #include <iostream>
 
-#define READ 0
-#define WRITE 1
+
 
 typedef ::mica::alloc::HugeTLBFS_SHM Alloc;
 
@@ -56,17 +55,7 @@ public:
 
 
 
-struct session_state{
-	uint32_t _action;
 
-	//firewall state:
-	struct firewall_state _firewall_state;
-
-
-
-	session_state():_action(READ),_firewall_state(){}
-
-};
 
 
 struct rte_ring_item{
