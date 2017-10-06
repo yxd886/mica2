@@ -197,7 +197,7 @@ public:
 
 	void check_session(struct fivetuple* five,firewall_state* state){
 
-		std::vector::iterator it;
+		std::vector<rule>::iterator it;
 		for(it==rules.begin();it!=rules.end();it++){
 			if(five->_dst_addr==it->_dst_addr&&five->_dst_port==it->_dst_port&&five->_src_addr==it->_src_addr&&five->_src_port==it->_src_port){
 				state->_pass=false;
@@ -249,7 +249,7 @@ public:
 
 			}else{
 
-				ses_state=&((struct rte_ring_item*)rev_item->_state);
+				ses_state=&(((struct rte_ring_item*)rev_item)->_state);
 			}
 
 			struct firewall_state* fw_state=update_state(&(ses_state->_firewall_state),tcp);
