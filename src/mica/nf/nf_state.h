@@ -6,7 +6,7 @@
 #define WRITE 1
 
 struct firewall_state{
-  uint8_t _tcp_flags;
+    uint8_t _tcp_flags;
 	uint32_t _sent_seq;
 	uint32_t _recv_ack;
 	bool _pass;
@@ -18,7 +18,7 @@ struct firewall_state{
 
 	}
 	void copy(struct firewall_state* c){
-		_tcp_flags=c->_tcp_flags;
+	    _tcp_flags=c->_tcp_flags;
 		_sent_seq=c->_sent_seq;
 		_recv_ack=c->_recv_ack;
 		_pass=c->_pass;

@@ -17,7 +17,7 @@
 typedef ::mica::alloc::HugeTLBFS_SHM Alloc;
 
 struct DPDKConfig : public ::mica::network::BasicDPDKConfig {
-  static constexpr bool kVerbose = true;
+    static constexpr bool kVerbose = true;
 };
 
 struct DatagramClientConfig
@@ -34,7 +34,7 @@ typedef ::mica::table::Result Result;
 
 template <typename T>
 static uint64_t hash(const T* key, size_t key_length) {
-  return ::mica::util::hash(key, key_length);
+    return ::mica::util::hash(key, key_length);
 }
 
 struct rule{
@@ -65,45 +65,46 @@ struct rte_ring_item{
 	struct session_state _state;
 
 
-  rte_ring_item(uint64_t key_hash,
-  							  size_t key_length,
-								char* key
-             ) :
-            	 _key_hash(key_hash),
-							 _key_length(key_length),
-							 _key(key),
-							 _state()
-               {}
+    rte_ring_item(uint64_t key_hash,size_t key_length,char* key) :
+        _key_hash(key_hash),
+        _key_length(key_length),
+        _key(key),
+        _state()
+        {}
 };
 
 
 
 void* poll_interface2worker_ring(struct rte_ring* interface2worker_ring){
-  int aggressive_poll_attemps = 50;
-  int flag = 0;
-  void* dequeue_output[1];
+    int aggressive_poll_attemps = 50;
+    int flag = 0;
+    void* dequeue_output[1];
 
-  for(int i=0; i<aggressive_poll_attemps; i++){
-    flag = rte_ring_sc_dequeue(interface2worker_ring, dequeue_output);
+    for(int i=0; i<aggressive_poll_attemps; i++){
+        flag = rte_ring_sc_dequeue(interface2worker_ring, dequeue_output);
 
-    if(flag != 0){
-      continue;
+        if(flag != 0){
+            continue;
+        }
+        else{
+            return dequeue_output[0];
+        }
     }
-    else{
-      return dequeue_output[0];
-    }
-  }
 
-  for(;;){
-    flag = rte_ring_sc_dequeue(interface2worker_ring, dequeue_output);
+    for(;;){
+        flag = rte_ring_sc_dequeue(interface2worker_ring, dequeue_output);
 
-    if(flag != 0){
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        if(flag != 0){
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+        else{
+            return dequeue_output[0];
+        }
     }
-    else{
-      return dequeue_output[0];
-    }
-  }
+}
+
+void* get_value(struct rte_ring* interface2worker_ring){
+    return poll_interface2worker_ring(interface2worker_ring);
 }
 
 struct fivetuple{
