@@ -69,7 +69,7 @@ struct firewall_state{
 	firewall_state():_tcp_flags(0),_sent_seq(0),_recv_ack(0),_pass(true){
 
 	}
-	firewall_state(uint8_t tcp_flags,uint64_t sent_seq,uint32_t recv_ack):_tcp_flags(tcp_flags),_sent_seq(sent_seq),_recv_ack(recv_ack),_pass(true){
+	firewall_state(uint8_t tcp_flags,uint32_t sent_seq,uint32_t recv_ack):_tcp_flags(tcp_flags),_sent_seq(sent_seq),_recv_ack(recv_ack),_pass(true){
 
 	}
 	void copy(struct firewall_state* c){
