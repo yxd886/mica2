@@ -50,6 +50,25 @@ struct load_balancer_state{
 
 };
 
+struct nat_state{
+    uint32_t _dst_ip_addr;
+    uint16_t _dst_port;
+    uint64_t _ip_port_list;
+
+    nat_state():_dst_ip_addr(0),_dst_port(0),_ip_port_list(0){
+
+    }
+
+    void copy(struct nat_state* c){
+        _dst_ip_addr=c->_dst_ip_addr;
+        _dst_port=c->_dst_port;
+        _ip_port_list=c->_ip_port_list;
+
+    }
+
+
+};
+
 
 
 struct session_state{
@@ -58,7 +77,8 @@ struct session_state{
     //firewall state:
     struct firewall_state _firewall_state;
     struct load_balancer_state _load_balancer_state;
-    session_state():_action(READ),_firewall_state(),_load_balancer_state(){}
+    struct nat_state _nat_state;
+    session_state():_action(READ),_firewall_state(),_load_balancer_state(),_nat_state(){}
 
 };
 

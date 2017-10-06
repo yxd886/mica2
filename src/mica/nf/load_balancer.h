@@ -93,9 +93,10 @@ public:
                     key= reinterpret_cast<char*>(&tuple);
                     key_length= sizeof(tuple);
                     key_hash= hash(key, key_length);
-                    item._state._action=WRITE;
-                    item._state._load_balancer_state._dst_ip_addr=server;
-                    rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
+                    struct rte_ring_item item1(key_hash,key_length,key);
+                    item1._state._action=WRITE;
+                    item1._state._load_balancer_state._dst_ip_addr=server;
+                    rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item1));
 
 
                     //To do:send packet to server

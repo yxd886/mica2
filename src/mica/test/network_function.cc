@@ -7,6 +7,7 @@
 #include <iostream>
 #include "mica/nf/firewall.h"
 #include "mica/nf/load_balancer.h"
+#include "mica/nf/nat.h"
 
 
 int main(int argc, const char* argv[]) {
@@ -15,5 +16,6 @@ int main(int argc, const char* argv[]) {
 	struct rte_ring* interface2worker[10];
 	Firewall a(worker2interface,interface2worker);
 	Load_balancer b(worker2interface,interface2worker,0);
+	NAT c(worker2interface,interface2worker,0);
 	return 0;
 }
