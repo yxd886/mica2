@@ -6,6 +6,9 @@
 #include <vector>
 #include <iostream>
 
+#define READ 0
+#define WRITE 1
+
 typedef ::mica::alloc::HugeTLBFS_SHM Alloc;
 
 struct DPDKConfig : public ::mica::network::BasicDPDKConfig {
@@ -57,11 +60,40 @@ public:
 
 };
 
-struct session_state{
-	bool _connected;
-	session_state(bool connected):_connected(connected){}
+struct firewall_state{
+  uint8_t _tcp_flags;
+	uint32_t _sent_seq;
+	uint32_t _recv_ack;
+	bool _pass;
+
+	firewall_state():_tcp_flags(0),_sent_seq(0),_recv_ack(0),_pass(true){
+
+	}
+	firewall_state(uint8_t tcp_flags,uint64_t sent_seq,uint32_t recv_ack):_tcp_flags(tcp_flags),_sent_seq(sent_seq),_recv_ack(recv_ack),_pass(true){
+
+	}
+	void copy(struct firewall_state* c){
+		_tcp_flags=c->_tcp_flags;
+		_sent_seq=c->_sent_seq;
+		_recv_ack=c->_recv_ack;
+		_pass=c->_pass;
+	}
+
 
 };
+
+struct session_state{
+	uint32_t _action;
+
+	//firewall state:
+	struct firewall_state _firewall_state;
+
+
+
+	session_state():_action(READ),_firewall_state(){}
+
+};
+
 
 struct rte_ring_item{
 	uint64_t _key_hash;
@@ -77,7 +109,7 @@ struct rte_ring_item{
             	 _key_hash(key_hash),
 							 _key_length(key_length),
 							 _key(key),
-							 _state(false)
+							 _state()
                {}
 };
 
@@ -153,6 +185,34 @@ public:
 	  }
 
 	}
+
+	struct firewall_state* update_state(struct firewall_state* firewall_state_ptr,struct tcp_hdr *tcp){
+
+
+		struct firewall_state* return_state=new firewall_state(tcp->tcp_flags,tcp->sent_seq,tcp->recv_ack);
+		return_state->_pass=firewall_state_ptr->_pass;
+		return return_state;
+
+	}
+
+	void check_session(struct fivetuple* five,firewall_state* state){
+
+		std::vector::iterator it;
+		for(it==rules.begin();it!=rules.end();it++){
+			if(five->_dst_addr==it->_dst_addr&&five->_dst_port==it->_dst_port&&five->_src_addr==it->_src_addr&&five->_src_port==it->_src_port){
+				state->_pass=false;
+			}
+		}
+		state->_pass=true;
+
+	}
+
+	bool state_changed(struct firewall_state* src,struct firewall_state* dst){
+		if(src->_tcp_flags!=dst->_tcp_flags||src->_recv_ack!=dst->_recv_ack||src->_sent_seq!=dst->_sent_seq){
+			return true;
+		}
+		return false;
+	}
 	void process_packet(struct rte_mbuf* rte_pkt){
 
 		struct ipv4_hdr *iphdr;
@@ -179,17 +239,31 @@ public:
 			rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
 			void* rev_item;
 			rev_item=poll_interface2worker_ring(_interface2worker[lcore_id]);
+			struct session_state* ses_state=nullptr;
+
 			if(rev_item==nullptr){
 				//new session
-
+				ses_state= new session_state();
+				ses_state->_action=WRITE;
+				check_session(&tuple,&(ses_state->_firewall_state));
 
 			}else{
 
-
-
+				ses_state=&((struct rte_ring_item*)rev_item->_state);
 			}
 
+			struct firewall_state* fw_state=update_state(&(ses_state->_firewall_state),tcp);
+			if(state_changed(&(ses_state->_firewall_state),fw_state)){
+				item._state._action=WRITE;
+				item._state._firewall_state.copy(fw_state);
+				rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
+			}
 
+			if(ses_state->_firewall_state._pass==true){
+				//pass
+			}else{
+				//drop
+			}
 
 
 
