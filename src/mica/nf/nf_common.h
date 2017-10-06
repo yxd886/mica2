@@ -59,10 +59,10 @@ public:
 
 
 struct rte_ring_item{
-	uint64_t _key_hash;
-	size_t _key_length;
-	char* _key;
-	struct session_state _state;
+    uint64_t _key_hash;
+    size_t _key_length;
+    char* _key;
+    struct session_state _state;
 
 
     rte_ring_item(uint64_t key_hash,size_t key_length,char* key) :
@@ -109,13 +109,11 @@ void* get_value(struct rte_ring* interface2worker_ring){
 
 struct fivetuple{
 public:
-
-
-	uint32_t _src_addr;
-	uint32_t _dst_addr;
-	uint16_t _src_port;
-	uint16_t _dst_port;
-	uint8_t _next_proto_id;
+    uint32_t _src_addr;
+    uint32_t _dst_addr;
+    uint16_t _src_port;
+    uint16_t _dst_port;
+    uint8_t _next_proto_id;
 	fivetuple(uint32_t src_addr,uint32_t dst_addr,uint16_t src_port,uint16_t dst_port,uint8_t next_proto_id):
 		_src_addr(src_addr),_dst_addr(dst_addr),_src_port(src_port),_dst_port(dst_port),_next_proto_id(next_proto_id){
 
