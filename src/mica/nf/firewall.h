@@ -121,11 +121,11 @@ public:
 	            rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
 	        }
 
-            if(ses_state->_firewall_state._pass==true){
+	        if(ses_state->_firewall_state._pass==true){
                 //pass
-            }else{
+	        }else{
                 //drop
-            }
+	        }
 
 
 
