@@ -1,6 +1,6 @@
 #pragma once
-#ifndef MICA_LOAD_BALANCER_H_
-#define MICA_LOAD_BALANCER_H_
+#ifndef MICA_NAT_H_
+#define MICA_NAT_H_
 
 
 #include "mica/datagram/datagram_client.h"
