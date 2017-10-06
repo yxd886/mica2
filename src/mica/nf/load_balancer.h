@@ -38,7 +38,7 @@ public:
 
     uint32_t next_server(){
         srand((unsigned)time(nullptr));
-        int index=rand()%_backend_list.size();
+        uint32_t index=(uint32_t)rand()%_backend_list.size();
         return _backend_list[index];
     }
 

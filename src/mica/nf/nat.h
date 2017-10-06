@@ -43,7 +43,7 @@ public:
 
     void select_ip_port(uint32_t* ip,uint16_t* port){
         srand((unsigned)time(nullptr));
-        int index=rand()%_ip_list.size();
+        uint32_t index=(uint32_t)rand()%_ip_list.size();
         *port=_port_list[index];
         *ip=_ip_list[index];
         return;
