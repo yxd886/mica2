@@ -30,7 +30,7 @@ public:
 
     void form_list(uint64_t backend_list_bit){
         _ip_list.clear();
-        for (int i=0;i<sizeof(backend_list_bit);i++){
+        for (uint32_t i=0;i<sizeof(backend_list_bit);i++){
             uint64_t t=backend_list_bit&0x1;
             if(t==1){
                 _ip_list.push_back(mica::network::NetworkAddress::parse_ipv4_addr(ip_lists[i].c_str()));
@@ -43,7 +43,7 @@ public:
 
     void select_ip_port(uint32_t* ip,uint16_t* port){
         srand((unsigned)time(nullptr));
-        uint32_t index=(uint32_t)rand()%_ip_list.size();
+        long unsigned int index=(long unsigned int)rand()%_ip_list.size();
         *port=_port_list[index];
         *ip=_ip_list[index];
         return;

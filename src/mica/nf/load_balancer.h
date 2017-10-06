@@ -29,7 +29,7 @@ public:
 
     void form_list(uint64_t backend_list_bit){
         _backend_list.clear();
-        for (int i=0;i<sizeof(backend_list_bit);i++){
+        for (uint32_t i=0;i<sizeof(backend_list_bit);i++){
             uint64_t t=backend_list_bit&0x1;
             if(t==1) _backend_list.push_back(mica::network::NetworkAddress::parse_ipv4_addr(lists[i].c_str()));
             backend_list_bit=backend_list_bit>>1;
@@ -38,7 +38,7 @@ public:
 
     uint32_t next_server(){
         srand((unsigned)time(nullptr));
-        uint32_t index=(uint32_t)rand()%_backend_list.size();
+        long unsigned int index=(long unsigned int)rand()%_backend_list.size();
         return _backend_list[index];
     }
 
