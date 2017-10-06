@@ -67,28 +67,28 @@ public:
 	}
 	void process_packet(struct rte_mbuf* rte_pkt){
 
-		struct ipv4_hdr *iphdr;
-		struct tcp_hdr *tcp;
-		unsigned lcore_id;
+	    struct ipv4_hdr *iphdr;
+	    struct tcp_hdr *tcp;
+	    unsigned lcore_id;
 
-		lcore_id = rte_lcore_id();
-		    iphdr = rte_pktmbuf_mtod_offset(rte_pkt,
-                                       struct ipv4_hdr *,
-                                       sizeof(struct ether_hdr));
+	    lcore_id = rte_lcore_id();
+	    iphdr = rte_pktmbuf_mtod_offset(rte_pkt,
+	            struct ipv4_hdr *,
+	            sizeof(struct ether_hdr));
 
-		if (iphdr->next_proto_id!=IPPROTO_TCP){
+	    if (iphdr->next_proto_id!=IPPROTO_TCP){
 		    //drop
-		}else{
+	    }else{
 
-            tcp = (struct tcp_hdr *)((unsigned char *)iphdr +sizeof(struct ipv4_hdr));
-            struct fivetuple tuple(iphdr->src_addr,iphdr->dst_addr,tcp->src_port,tcp->dst_port,iphdr->next_proto_id);
+	        tcp = (struct tcp_hdr *)((unsigned char *)iphdr +sizeof(struct ipv4_hdr));
+	        struct fivetuple tuple(iphdr->src_addr,iphdr->dst_addr,tcp->src_port,tcp->dst_port,iphdr->next_proto_id);
 
             //generate key based on five-tuples
-            char* key = reinterpret_cast<char*>(&tuple);
-            size_t key_length;
-            key_length= sizeof(tuple);
-            uint64_t key_hash;
-            key_hash= hash(key, key_length);
+	        char* key = reinterpret_cast<char*>(&tuple);
+	        size_t key_length;
+	        key_length= sizeof(tuple);
+	        uint64_t key_hash;
+	        key_hash= hash(key, key_length);
 
 
             //generate rte_ring_item
