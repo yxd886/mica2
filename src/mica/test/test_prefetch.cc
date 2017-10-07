@@ -147,28 +147,11 @@ static struct lcore_params *lcore_params = lcore_params_array_default;
 static uint16_t nb_lcore_params = sizeof(lcore_params_array_default) /
                 sizeof(lcore_params_array_default[0]);
 
-static struct rte_eth_conf port_conf = {
-    .rxmode = {
-        .mq_mode    = ETH_MQ_RX_RSS,
-        .max_rx_pkt_len = ETHER_MAX_LEN,
-        .split_hdr_size = 0,
-        .header_split   = 0, /**< Header Split disabled */
-        .hw_ip_checksum = 1, /**< IP checksum offload enabled */
-        .hw_vlan_filter = 0, /**< VLAN filtering disabled */
-        .jumbo_frame    = 0, /**< Jumbo Frame Support disabled */
-        .hw_strip_crc   = 0, /**< CRC stripped by hardware */
-    },
-    .rx_adv_conf = {
-        .rss_conf = {
-            .rss_key = NULL,
-            .rss_hf = ETH_RSS_IP | ETH_RSS_UDP |
-                ETH_RSS_TCP | ETH_RSS_SCTP,
-        },
-    },
-    .txmode = {
-        .mq_mode = ETH_MQ_TX_NONE,
-    },
-};
+struct rte_eth_conf port_conf;
+
+
+
+
 
 static struct rte_mempool *pktmbuf_pool[NB_SOCKETS];
 
@@ -268,7 +251,7 @@ enum {
     RTE_ACL_IPV4VLAN_NUM
 };
 
-struct rte_acl_field_def ipv4_defs[NUM_FIELDS_IPV4] = {
+/*struct rte_acl_field_def ipv4_defs[NUM_FIELDS_IPV4] = {
     {
         .type = RTE_ACL_FIELD_TYPE_BITMASK,
         .size = sizeof(uint8_t),
@@ -309,7 +292,7 @@ struct rte_acl_field_def ipv4_defs[NUM_FIELDS_IPV4] = {
             offsetof(struct ipv4_hdr, next_proto_id) +
             sizeof(uint16_t),
     },
-};
+};*/
 
 #define IPV6_ADDR_LEN   16
 #define IPV6_ADDR_U16   (IPV6_ADDR_LEN / sizeof(uint16_t))
@@ -329,7 +312,7 @@ enum {
     DSTP_FIELD_IPV6,
     NUM_FIELDS_IPV6
 };
-
+/*
 struct rte_acl_field_def ipv6_defs[NUM_FIELDS_IPV6] = {
     {
         .type = RTE_ACL_FIELD_TYPE_BITMASK,
@@ -419,7 +402,7 @@ struct rte_acl_field_def ipv6_defs[NUM_FIELDS_IPV6] = {
             offsetof(struct ipv6_hdr, proto) + sizeof(uint16_t),
     },
 };
-
+*/
 enum {
     CB_FLD_SRC_ADDR,
     CB_FLD_DST_ADDR,
@@ -434,8 +417,8 @@ enum {
     CB_FLD_NUM,
 };
 
-RTE_ACL_RULE_DEF(acl4_rule, RTE_DIM(ipv4_defs));
-RTE_ACL_RULE_DEF(acl6_rule, RTE_DIM(ipv6_defs));
+//RTE_ACL_RULE_DEF(acl4_rule, RTE_DIM(ipv4_defs));
+//RTE_ACL_RULE_DEF(acl6_rule, RTE_DIM(ipv6_defs));
 
 struct acl_search_t {
     const uint8_t *data_ipv4[MAX_PKT_BURST];
@@ -466,7 +449,7 @@ static struct{
 } parm_config;
 
 const char cb_port_delim[] = ":";
-
+/*
 static inline void
 print_one_ipv4_rule(struct acl4_rule *rule, int extra)
 {
@@ -492,8 +475,8 @@ print_one_ipv4_rule(struct acl4_rule *rule, int extra)
             rule->data.category_mask,
             rule->data.priority,
             rule->data.userdata);
-}
-
+}*/
+/*
 static inline void
 print_one_ipv6_rule(struct acl6_rule *rule, int extra)
 {
@@ -545,7 +528,7 @@ print_one_ipv6_rule(struct acl6_rule *rule, int extra)
             rule->data.category_mask,
             rule->data.priority,
             rule->data.userdata);
-}
+}*/
 
 /* Bypass comment and empty lines */
 static inline int
@@ -566,6 +549,7 @@ is_bypass_line(char *buff)
 }
 
 #ifdef L3FWDACL_DEBUG
+/*
 static inline void
 dump_acl4_rule(struct rte_mbuf *m, uint32_t sig)
 {
@@ -588,8 +572,8 @@ dump_acl4_rule(struct rte_mbuf *m, uint32_t sig)
     print_one_ipv4_rule(acl_config.rule_ipv4 + offset, 1);
 
     printf("\n\n");
-}
-
+}*/
+/*
 static inline void
 dump_acl6_rule(struct rte_mbuf *m, uint32_t sig)
 {
@@ -617,9 +601,9 @@ dump_acl6_rule(struct rte_mbuf *m, uint32_t sig)
     print_one_ipv6_rule(acl_config.rule_ipv6 + offset, 1);
 
     printf("\n\n");
-}
+}*/
 #endif /* L3FWDACL_DEBUG */
-
+/*
 static inline void
 dump_ipv4_rules(struct acl4_rule *rule, int num, int extra)
 {
@@ -630,8 +614,8 @@ dump_ipv4_rules(struct acl4_rule *rule, int num, int extra)
         print_one_ipv4_rule(rule, extra);
         printf("\n");
     }
-}
-
+}*/
+/*
 static inline void
 dump_ipv6_rules(struct acl6_rule *rule, int num, int extra)
 {
@@ -642,9 +626,10 @@ dump_ipv6_rules(struct acl6_rule *rule, int num, int extra)
         print_one_ipv6_rule(rule, extra);
         printf("\n");
     }
-}
+}*/
 
 #ifdef DO_RFC_1812_CHECKS
+/*
 static inline void
 prepare_one_packet(struct rte_mbuf **pkts_in, struct acl_search_t *acl,
     int index)
@@ -656,32 +641,32 @@ prepare_one_packet(struct rte_mbuf **pkts_in, struct acl_search_t *acl,
         ipv4_hdr = rte_pktmbuf_mtod_offset(pkt, struct ipv4_hdr *,
                            sizeof(struct ether_hdr));
 
-        /* Check to make sure the packet is valid (RFC1812) */
+        // Check to make sure the packet is valid (RFC1812) //
         if (is_valid_ipv4_pkt(ipv4_hdr, pkt->pkt_len) >= 0) {
 
-            /* Update time to live and header checksum */
+            // Update time to live and header checksum //
             --(ipv4_hdr->time_to_live);
             ++(ipv4_hdr->hdr_checksum);
 
-            /* Fill acl structure */
+            // Fill acl structure //
             acl->data_ipv4[acl->num_ipv4] = MBUF_IPV4_2PROTO(pkt);
             acl->m_ipv4[(acl->num_ipv4)++] = pkt;
 
         } else {
-            /* Not a valid IPv4 packet */
+            // Not a valid IPv4 packet //
             rte_pktmbuf_free(pkt);
         }
     } else if (RTE_ETH_IS_IPV6_HDR(pkt->packet_type)) {
-        /* Fill acl structure */
+        // Fill acl structure //
         acl->data_ipv6[acl->num_ipv6] = MBUF_IPV6_2PROTO(pkt);
         acl->m_ipv6[(acl->num_ipv6)++] = pkt;
 
     } else {
-        /* Unknown type, drop the packet */
+        //Unknown type, drop the packet //
         rte_pktmbuf_free(pkt);
     }
 }
-
+*/
 #else
 static inline void
 prepare_one_packet(struct rte_mbuf **pkts_in, struct acl_search_t *acl,
@@ -704,7 +689,7 @@ prepare_one_packet(struct rte_mbuf **pkts_in, struct acl_search_t *acl,
     }
 }
 #endif /* DO_RFC_1812_CHECKS */
-
+/*
 static inline void
 prepare_acl_parameter(struct rte_mbuf **pkts_in, struct acl_search_t *acl,
     int nb_rx)
@@ -714,7 +699,7 @@ prepare_acl_parameter(struct rte_mbuf **pkts_in, struct acl_search_t *acl,
     acl->num_ipv4 = 0;
     acl->num_ipv6 = 0;
 
-    /* Prefetch first packets */
+    // Prefetch first packets
     for (i = 0; i < PREFETCH_OFFSET && i < nb_rx; i++) {
         rte_prefetch0(rte_pktmbuf_mtod(
                 pkts_in[i], void *));
@@ -726,10 +711,10 @@ prepare_acl_parameter(struct rte_mbuf **pkts_in, struct acl_search_t *acl,
         prepare_one_packet(pkts_in, acl, i);
     }
 
-    /* Process left packets */
+    // Process left packets
     for (; i < nb_rx; i++)
         prepare_one_packet(pkts_in, acl, i);
-}
+}*/
 
 static inline void
 send_one_packet(struct rte_mbuf *m, uint32_t res)
@@ -804,7 +789,7 @@ parse_ipv6_addr(const char *in, const char **end, uint32_t v[IPV6_ADDR_U32],
 
     return 0;
 }
-
+/*
 static int
 parse_ipv6_net(const char *in, struct rte_acl_field field[4])
 {
@@ -813,15 +798,15 @@ parse_ipv6_net(const char *in, struct rte_acl_field field[4])
     uint32_t i, m, v[4];
     const uint32_t nbu32 = sizeof(uint32_t) * CHAR_BIT;
 
-    /* get address. */
+    // get address.
     rc = parse_ipv6_addr(in, &mp, v, '/');
     if (rc != 0)
         return rc;
 
-    /* get mask. */
+    // get mask.
     GET_CB_FIELD(mp, m, 0, CHAR_BIT * sizeof(v), 0);
 
-    /* put all together. */
+     // all together.
     for (i = 0; i != RTE_DIM(v); i++) {
         if (m >= (i + 1) * nbu32)
             field[i].mask_range.u32 = nbu32;
@@ -833,8 +818,8 @@ parse_ipv6_net(const char *in, struct rte_acl_field field[4])
     }
 
     return 0;
-}
-
+}*/
+/*
 static int
 parse_cb_ipv6_rule(char *str, struct rte_acl_rule *v, int has_userdata)
 {
@@ -864,7 +849,7 @@ parse_cb_ipv6_rule(char *str, struct rte_acl_rule *v, int has_userdata)
         return rc;
     }
 
-    /* source port. */
+    // source port.
     GET_CB_FIELD(in[CB_FLD_SRC_PORT_LOW],
         v->field[SRCP_FIELD_IPV6].value.u16,
         0, UINT16_MAX, 0);
@@ -876,7 +861,7 @@ parse_cb_ipv6_rule(char *str, struct rte_acl_rule *v, int has_userdata)
             sizeof(cb_port_delim)) != 0)
         return -EINVAL;
 
-    /* destination port. */
+    // destination port.
     GET_CB_FIELD(in[CB_FLD_DST_PORT_LOW],
         v->field[DSTP_FIELD_IPV6].value.u16,
         0, UINT16_MAX, 0);
@@ -905,7 +890,7 @@ parse_cb_ipv6_rule(char *str, struct rte_acl_rule *v, int has_userdata)
 
     return 0;
 }
-
+*/
 /*
  * Parse ClassBench rules file.
  * Expected format:
@@ -931,7 +916,7 @@ parse_ipv4_net(const char *in, uint32_t *addr, uint32_t *mask_len)
 
     return 0;
 }
-
+/*
 static int
 parse_cb_ipv4vlan_rule(char *str, struct rte_acl_rule *v, int has_userdata)
 {
@@ -1003,8 +988,8 @@ parse_cb_ipv4vlan_rule(char *str, struct rte_acl_rule *v, int has_userdata)
             UINT32_MAX, 0);
 
     return 0;
-}
-
+}*/
+/*
 static int
 add_rules(const char *rule_path,
         struct rte_acl_rule **proute_base,
@@ -1059,17 +1044,17 @@ add_rules(const char *rule_path,
 
         char s = buff[0];
 
-        /* Route entry */
+        // Route entry
         if (s == ROUTE_LEAD_CHAR)
             next = (struct rte_acl_rule *)(route_rules +
                 route_cnt * rule_size);
 
-        /* ACL entry */
+        // ACL entry
         else if (s == ACL_LEAD_CHAR)
             next = (struct rte_acl_rule *)(acl_rules +
                 acl_cnt * rule_size);
 
-        /* Illegal line */
+        // Illegal line
         else
             rte_exit(EXIT_FAILURE,
                 "%s Line %u: should start with leading "
@@ -1082,7 +1067,7 @@ add_rules(const char *rule_path,
                 rule_path, i);
 
         if (s == ROUTE_LEAD_CHAR) {
-            /* Check the forwarding port number */
+            // Check the forwarding port number
             if ((enabled_port_mask & (1 << next->data.userdata)) ==
                     0)
                 rte_exit(EXIT_FAILURE,
@@ -1108,8 +1093,8 @@ add_rules(const char *rule_path,
     *proute_num = route_cnt;
 
     return 0;
-}
-
+}*/
+/*
 static void
 dump_acl_config(void)
 {
@@ -1131,8 +1116,8 @@ check_acl_config(void)
     }
 
     return 0;
-}
-
+}*/
+/*
 static struct rte_acl_ctx*
 setup_acl(struct rte_acl_rule *route_base,
         struct rte_acl_rule *acl_base, unsigned int route_num,
@@ -1144,7 +1129,7 @@ setup_acl(struct rte_acl_rule *route_base,
     struct rte_acl_ctx *context;
     int dim = ipv6 ? RTE_DIM(ipv6_defs) : RTE_DIM(ipv4_defs);
 
-    /* Create ACL contexts */
+    // Create ACL contexts
     snprintf(name, sizeof(name), "%s%d",
             ipv6 ? L3FWD_ACL_IPV6_NAME : L3FWD_ACL_IPV4_NAME,
             socketid);
@@ -1168,7 +1153,7 @@ setup_acl(struct rte_acl_rule *route_base,
     if (rte_acl_add_rules(context, acl_base, acl_num) < 0)
             rte_exit(EXIT_FAILURE, "add rules failed\n");
 
-    /* Perform builds */
+    // Perform builds
     memset(&acl_build_param, 0, sizeof(acl_build_param));
 
     acl_build_param.num_categories = DEFAULT_MAX_CATEGORIES;
@@ -1182,9 +1167,9 @@ setup_acl(struct rte_acl_rule *route_base,
     rte_acl_dump(context);
 
     return context;
-}
+}*/
 
-static int
+/*static int
 app_acl_init(void)
 {
     unsigned lcore_id;
@@ -1200,7 +1185,7 @@ app_acl_init(void)
 
     dump_acl_config();
 
-    /* Load  rules from the input file */
+    // Load  rules from the input file
     if (add_rules(parm_config.rule_ipv4_name, &route_base_ipv4,
             &route_num_ipv4, &acl_base_ipv4, &acl_num_ipv4,
             sizeof(struct acl4_rule), &parse_cb_ipv4vlan_rule) < 0)
@@ -1226,7 +1211,7 @@ app_acl_init(void)
 
     memset(&acl_config, 0, sizeof(acl_config));
 
-    /* Check sockets a context should be created on */
+    // Check sockets a context should be created on
     if (!numa_on)
         acl_config.mapped[0] = 1;
     else {
@@ -1274,7 +1259,7 @@ app_acl_init(void)
 #endif
 
     return 0;
-}
+}*/
 
 /***********************end of ACL part******************************/
 
@@ -1892,6 +1877,21 @@ check_all_ports_link_status(uint8_t port_num, uint32_t port_mask)
     }
 }
 
+void port_config(){
+    port_conf.rxmode.mq_mode    = ETH_MQ_RX_RSS,
+    port_conf.rxmode.max_rx_pkt_len = ETHER_MAX_LEN,
+    port_conf.rxmode.split_hdr_size = 0,
+    port_conf.rxmode.header_split   = 0, /**< Header Split disabled */
+    port_conf.rxmode.hw_ip_checksum = 1, /**< IP checksum offload enabled */
+    port_conf.rxmode.hw_vlan_filter = 0, /**< VLAN filtering disabled */
+    port_conf.rxmode.jumbo_frame    = 0, /**< Jumbo Frame Support disabled */
+    port_conf.rxmode.hw_strip_crc   = 0, /**< CRC stripped by hardware */
+    port_conf.rx_adv_conf.rss_conf.rss_key = NULL,
+    port_conf.rx_adv_conf.rss_conf.rss_hf = ETH_RSS_IP | ETH_RSS_UDP |
+    ETH_RSS_TCP | ETH_RSS_SCTP,
+    port_conf.txmode.mq_mode = ETH_MQ_TX_NONE;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -1904,6 +1904,7 @@ main(int argc, char **argv)
     unsigned lcore_id;
     uint32_t n_tx_queue, nb_lcores;
     uint8_t portid, nb_rx_queue, queue, socketid;
+    port_config();
 
     /* init EAL */
     ret = rte_eal_init(argc, argv);
@@ -1975,7 +1976,7 @@ main(int argc, char **argv)
 
             /* Initialize TX buffers */
             qconf = &lcore_conf[lcore_id];
-            qconf->tx_buffer[portid] = rte_zmalloc_socket("tx_buffer",
+            qconf->tx_buffer[portid] = (struct rte_eth_dev_tx_buffer *)rte_zmalloc_socket("tx_buffer",
                     RTE_ETH_TX_BUFFER_SIZE(MAX_PKT_BURST), 0,
                     rte_eth_dev_socket_id(portid));
             if (qconf->tx_buffer[portid] == NULL)
