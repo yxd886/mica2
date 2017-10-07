@@ -1963,7 +1963,7 @@ main(int argc, char **argv)
         printf(", ");
 
         /* init memory */
-        ret = init_mem(2048);
+        ret = init_mem(NB_MBUF);
         if (ret < 0)
             rte_exit(EXIT_FAILURE, "init_mem failed\n");
 
