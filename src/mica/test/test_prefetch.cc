@@ -1803,6 +1803,7 @@ init_mem(unsigned nb_mbuf)
         }
         if (pktmbuf_pool[socketid] == NULL) {
             snprintf(s, sizeof(s), "mbuf_pool_%d", socketid);
+            printf("s: %s, nb_mbuf:%d, nb_mbuf:%d,MEMPOOL_CACHE_SIZE:%d, RTE_MBUF_DEFAULT_BUF_SIZE: %d\n",s,nb_mbuf,MEMPOOL_CACHE_SIZE,RTE_MBUF_DEFAULT_BUF_SIZE);
             pktmbuf_pool[socketid] =
                 rte_pktmbuf_pool_create(s, nb_mbuf,
                     MEMPOOL_CACHE_SIZE, 0,
