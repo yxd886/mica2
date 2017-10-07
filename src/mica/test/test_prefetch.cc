@@ -1790,9 +1790,10 @@ init_mem(unsigned nb_mbuf)
         if (rte_lcore_is_enabled(lcore_id) == 0)
             continue;
 
-        if (numa_on)
+        if (numa_on){
             socketid = rte_lcore_to_socket_id(lcore_id);
-        else
+            printf("socketid= %d\n",socketid);
+        }else
             socketid = 0;
 
         if (socketid >= NB_SOCKETS) {
