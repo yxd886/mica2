@@ -11,6 +11,8 @@
 
 
 #define MAX_LCORE_NUM 4
+struct rte_ring* worker2interface[10];
+struct rte_ring* interface2worker[10];
 
 
 /*-
@@ -62,30 +64,7 @@
 #include <signal.h>
 #include <stdbool.h>
 
-#include <rte_common.h>
-#include <rte_log.h>
-#include <rte_malloc.h>
-#include <rte_memory.h>
-#include <rte_memcpy.h>
-#include <rte_memzone.h>
-#include <rte_eal.h>
-#include <rte_per_lcore.h>
-#include <rte_launch.h>
-#include <rte_atomic.h>
-#include <rte_cycles.h>
-#include <rte_prefetch.h>
-#include <rte_lcore.h>
-#include <rte_per_lcore.h>
-#include <rte_branch_prediction.h>
-#include <rte_interrupts.h>
-#include <rte_pci.h>
-#include <rte_random.h>
-#include <rte_debug.h>
-#include <rte_ether.h>
-#include <rte_ethdev.h>
-#include <rte_ring.h>
-#include <rte_mempool.h>
-#include <rte_mbuf.h>
+
 
 static volatile bool force_quit;
 
@@ -192,6 +171,7 @@ print_stats(void)
 static void
 l2fwd_simple_forward(struct rte_mbuf *m, unsigned portid)
 {
+    Firewall a(worker2interface,interface2worker);
     struct ether_hdr *eth;
     void *tmp;
     unsigned dst_port;
@@ -200,26 +180,34 @@ l2fwd_simple_forward(struct rte_mbuf *m, unsigned portid)
     unsigned lcore_id;
     lcore_id = rte_lcore_id();
 
-    dst_port = l2fwd_dst_ports[portid];
+    dst_port = portid;
     eth = rte_pktmbuf_mtod(m, struct ether_hdr *);
 
     /* 02:00:00:00:00:xx */
-    tmp = &eth->d_addr.addr_bytes[0];
-    *((uint64_t *)tmp) = 0x000000000002 + ((uint64_t)dst_port << 40);
+ //   tmp = &eth->d_addr.addr_bytes[0];
+ //   *((uint64_t *)tmp) = 0x000000000002 + ((uint64_t)dst_port << 40);
 
     /* src addr */
     ether_addr_copy(&l2fwd_ports_eth_addr[dst_port], &eth->s_addr);
 
-    buffer = tx_buffer[dst_port][lcore_id];
-    sent = rte_eth_tx_buffer(dst_port, 0, buffer, m);
-    if (sent)
-        port_statistics[dst_port].tx += sent;
+    a.process_packet(m);
+    if(a._drop){
+        rte_pktmbuf_free(m);
+    }else{
+        buffer = tx_buffer[dst_port][lcore_id];
+        sent = rte_eth_tx_buffer(dst_port, 0, buffer, m);
+        if (sent)
+            port_statistics[dst_port].tx += sent;
+    }
+
+
 }
 
 /* main processing loop */
 static void
 l2fwd_main_loop(void)
 {
+
     struct rte_mbuf *pkts_burst[MAX_PKT_BURST];
     struct rte_mbuf *m;
     int sent;
@@ -721,7 +709,7 @@ main(int argc, char **argv)
         /* init one TX queue on each port */
         fflush(stdout);
         for(int i=0;i<MAX_LCORE_NUM;i++){
-            ret = rte_eth_tx_queue_setup(portid, 0, nb_txd,
+            ret = rte_eth_tx_queue_setup(portid, i, nb_txd,
                     rte_eth_dev_socket_id(portid),
                     NULL);
             if (ret < 0)

@@ -16,7 +16,7 @@
 class Firewall{
 public:
     Firewall(struct rte_ring** worker2interface,struct rte_ring** interface2worker):
-		_worker2interface(worker2interface),_interface2worker(interface2worker){
+		_worker2interface(worker2interface),_interface2worker(interface2worker),_drop(false){
 
         auto rules_config = ::mica::util::Config::load_file("firewall.json").get("rules");
         for (size_t i = 0; i < rules_config.size(); i++) {
@@ -70,6 +70,7 @@ public:
 	    struct ipv4_hdr *iphdr;
 	    struct tcp_hdr *tcp;
 	    unsigned lcore_id;
+	    _drop=false;
 
 	    lcore_id = rte_lcore_id();
 	    iphdr = rte_pktmbuf_mtod_offset(rte_pkt,
@@ -78,6 +79,8 @@ public:
 
 	    if (iphdr->next_proto_id!=IPPROTO_TCP){
 		    //drop
+	        _drop=true;
+	        return;
 	    }else{
 
 	        tcp = (struct tcp_hdr *)((unsigned char *)iphdr +sizeof(struct ipv4_hdr));
@@ -123,8 +126,12 @@ public:
 
 	        if(ses_state->_firewall_state._pass==true){
                 //pass
+	            _drop=false;
+	            return;
 	        }else{
                 //drop
+	            _drop=true;
+	            return;
 	        }
 
 
@@ -137,6 +144,7 @@ public:
 	std::vector<rule> rules;
 	struct rte_ring** _worker2interface;
 	struct rte_ring** _interface2worker;
+	bool _drop;
 
 };
 

@@ -22,7 +22,7 @@ std::string lists[64]={"192.168.122.131","192.168.122.132","192.168.122.133","19
 class Load_balancer{
 public:
     Load_balancer(struct rte_ring** worker2interface,struct rte_ring** interface2worker,uint32_t cluster_id):
-        _worker2interface(worker2interface),_interface2worker(interface2worker),_cluster_id(cluster_id){
+        _worker2interface(worker2interface),_interface2worker(interface2worker),_cluster_id(cluster_id),_drop(false){
 
     }
 
@@ -46,6 +46,7 @@ public:
         struct ipv4_hdr *iphdr;
         struct tcp_hdr *tcp;
         unsigned lcore_id;
+        _drop=false;
 
         lcore_id = rte_lcore_id();
         iphdr = rte_pktmbuf_mtod_offset(rte_pkt,
@@ -54,6 +55,8 @@ public:
 
         if (iphdr->next_proto_id!=IPPROTO_TCP){
             //drop
+            _drop=true;
+            return;
         }else{
 
             tcp = (struct tcp_hdr *)((unsigned char *)iphdr +sizeof(struct ipv4_hdr));
@@ -100,6 +103,10 @@ public:
 
 
                     //To do:send packet to server
+                    iphdr->dst_addr=server;
+                    _drop=false;
+                    return;
+
 
 
 
@@ -117,6 +124,8 @@ public:
                 rev_item=get_value(_interface2worker[lcore_id]);
                 if(rev_item==nullptr){
                     //To do: drop this packet
+                    _drop=true;
+                    return;
 
 
 
@@ -126,6 +135,9 @@ public:
                     server=ses_state->_load_balancer_state._dst_ip_addr;
 
                     //To do: send this packet to address server.
+                    iphdr->dst_addr=server;
+                    _drop=false;
+                    return;
                 }
 
 
@@ -144,6 +156,7 @@ struct rte_ring** _worker2interface;
 struct rte_ring** _interface2worker;
 uint32_t _cluster_id;
 std::vector<uint32_t> _backend_list;
+bool _drop;
 };
 
 #endif

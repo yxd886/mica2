@@ -23,7 +23,7 @@ uint16_t port_lists[64]={10012,10013,10014,10015,10016,10017,10018,10019,10020,1
 class NAT{
 public:
     NAT(struct rte_ring** worker2interface,struct rte_ring** interface2worker,uint32_t cluster_id):
-        _worker2interface(worker2interface),_interface2worker(interface2worker),_cluster_id(cluster_id){
+        _worker2interface(worker2interface),_interface2worker(interface2worker),_cluster_id(cluster_id),_drop(false){
 
     }
 
@@ -66,6 +66,7 @@ public:
         struct tcp_hdr *tcp;
         unsigned lcore_id;
         void* rev_item;
+        _drop=false;
         struct session_state* ses_state=nullptr;
 
         lcore_id = rte_lcore_id();
@@ -75,6 +76,8 @@ public:
 
         if (iphdr->next_proto_id!=IPPROTO_TCP){
             //drop
+            _drop=true;
+            return;
         }else{
 
             tcp = (struct tcp_hdr *)((unsigned char *)iphdr +sizeof(struct ipv4_hdr));
@@ -144,6 +147,7 @@ public:
 
 
             //To do: send packet.
+            return;
 
 
 
@@ -157,6 +161,7 @@ struct rte_ring** _interface2worker;
 uint32_t _cluster_id;
 std::vector<uint32_t> _ip_list;
 std::vector<uint16_t> _port_list;
+bool _drop;
 };
 
 #endif
