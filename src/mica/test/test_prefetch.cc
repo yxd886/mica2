@@ -1350,16 +1350,13 @@ l2fwd_simple_forward(struct rte_mbuf *m, unsigned portid)
  //   *((uint64_t *)tmp) = 0x000000000002 + ((uint64_t)dst_port << 40);
 
     /* src addr */
-    ether_addr_copy(&l2fwd_ports_eth_addr[dst_port], &eth->s_addr);
+   // ether_addr_copy(&l2fwd_ports_eth_addr[dst_port], &eth->s_addr);
 
     a.process_packet(m);
     if(a._drop){
         rte_pktmbuf_free(m);
     }else{
-        buffer = tx_buffer[dst_port][lcore_id];
-        sent = rte_eth_tx_buffer(dst_port, 0, buffer, m);
-        if (sent)
-            port_statistics[dst_port].tx += sent;
+        send_single_packet(m,portid);
     }
 
 
