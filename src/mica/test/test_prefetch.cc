@@ -1807,7 +1807,7 @@ init_mem(unsigned nb_mbuf)
             pktmbuf_pool[socketid] =
                 rte_pktmbuf_pool_create(s, nb_mbuf,
                     MEMPOOL_CACHE_SIZE, 0,
-                    RTE_MBUF_DEFAULT_BUF_SIZE,
+                    2176,
                     socketid);
             if (pktmbuf_pool[socketid] == NULL)
                 rte_exit(EXIT_FAILURE,
