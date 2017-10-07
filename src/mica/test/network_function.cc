@@ -126,27 +126,8 @@ struct lcore_queue_conf lcore_queue_conf[RTE_MAX_LCORE];
 
 static struct rte_eth_dev_tx_buffer *tx_buffer[RTE_MAX_ETHPORTS][MAX_LCORE_NUM];
 
-static const struct rte_eth_conf port_conf = {
-        .rxmode = {
-            .mq_mode = ETH_MQ_RX_RSS,
-            .max_rx_pkt_len = ETHER_MAX_LEN,
-            .split_hdr_size = 0,
-            .header_split   = 0, /**< Header Split disabled */
-            .hw_ip_checksum = 1, /**< IP checksum offload enabled */
-            .hw_vlan_filter = 0, /**< VLAN filtering disabled */
-            .jumbo_frame    = 0, /**< Jumbo Frame Support disabled */
-            .hw_strip_crc   = 0, /**< CRC stripped by hardware */
-        },
-        .rx_adv_conf = {
-            .rss_conf = {
-                .rss_key = NULL,
-                .rss_hf = ETH_RSS_IP,
-            },
-        },
-        .txmode = {
-            .mq_mode = ETH_MQ_TX_NONE,
-        },
-};
+struct rte_eth_conf port_conf;
+
 
 struct rte_mempool * l2fwd_pktmbuf_pool = NULL;
 
@@ -539,13 +520,33 @@ signal_handler(int signum)
     }
 }
 
+void port_config(){
+    port_conf.mq_mode = ETH_MQ_RX_RSS,
+    port_conf.max_rx_pkt_len = ETHER_MAX_LEN,
+    port_conf.split_hdr_size = 0,
+    port_conf.header_split   = 0, /**< Header Split disabled */
+    port_conf.hw_ip_checksum = 1, /**< IP checksum offload enabled */
+    port_conf.hw_vlan_filter = 0, /**< VLAN filtering disabled */
+    port_conf.jumbo_frame    = 0, /**< Jumbo Frame Support disabled */
+    port_conf.hw_strip_crc   = 0, /**< CRC stripped by hardware */
+
+
+
+    port_conf.rx_adv_conf.rss_conf.rss_key = NULL,
+    port_conf.rx_adv_conf.rss_conf.rss_hf = ETH_RSS_IP,
+
+
+
+    port_conf.txmode.mq_mode = ETH_MQ_TX_NONE,
+}
+
 int
-main(int argb, char **argt)
+main(int argc, char **argv)
 {
 
 
-    char * argv[10]={"./build/l2fwd","-l","0-3","-n","4","--","-q","1","-p","ffff"};
-    int argc=10;
+
+    port_config();
     struct lcore_queue_conf *qconf;
     struct rte_eth_dev_info dev_info;
     int ret;
