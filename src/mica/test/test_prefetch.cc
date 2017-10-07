@@ -1810,8 +1810,8 @@ init_mem(unsigned nb_mbuf)
                     socketid);
             if (pktmbuf_pool[socketid] == NULL)
                 rte_exit(EXIT_FAILURE,
-                    "Cannot init mbuf pool on socket %d\n",
-                    socketid);
+                    "Cannot init mbuf pool on socket %d，errno: %d\n",
+                    socketid,rte_errno);
             else
                 printf("Allocated mbuf pool on socket %d\n",
                     socketid);
