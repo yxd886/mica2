@@ -521,14 +521,14 @@ signal_handler(int signum)
 }
 
 void port_config(){
-    port_conf.mq_mode = ETH_MQ_RX_RSS,
-    port_conf.max_rx_pkt_len = ETHER_MAX_LEN,
-    port_conf.split_hdr_size = 0,
-    port_conf.header_split   = 0, /**< Header Split disabled */
-    port_conf.hw_ip_checksum = 1, /**< IP checksum offload enabled */
-    port_conf.hw_vlan_filter = 0, /**< VLAN filtering disabled */
-    port_conf.jumbo_frame    = 0, /**< Jumbo Frame Support disabled */
-    port_conf.hw_strip_crc   = 0, /**< CRC stripped by hardware */
+    port_conf.rxmode.mq_mode = ETH_MQ_RX_RSS,
+    port_conf.rxmode.max_rx_pkt_len = ETHER_MAX_LEN,
+    port_conf.rxmode.split_hdr_size = 0,
+    port_conf.rxmode.header_split   = 0, /**< Header Split disabled */
+    port_conf.rxmode.hw_ip_checksum = 1, /**< IP checksum offload enabled */
+    port_conf.rxmode.hw_vlan_filter = 0, /**< VLAN filtering disabled */
+    port_conf.rxmode.jumbo_frame    = 0, /**< Jumbo Frame Support disabled */
+    port_conf.rxmode.hw_strip_crc   = 0, /**< CRC stripped by hardware */
 
 
 
@@ -537,7 +537,7 @@ void port_config(){
 
 
 
-    port_conf.txmode.mq_mode = ETH_MQ_TX_NONE,
+    port_conf.txmode.mq_mode = ETH_MQ_TX_NONE;
 }
 
 int
