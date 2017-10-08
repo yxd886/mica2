@@ -1096,7 +1096,12 @@ main(int argc, char **argv)
         rte_eal_remote_launch(main_loop,NULL,i);
     }
 
-
+    RTE_LCORE_FOREACH_SLAVE(lcore_id) {
+        if (rte_eal_wait_lcore(lcore_id) < 0) {
+            ret = -1;
+            break;
+        }
+    }
 
 
     //start mica client
