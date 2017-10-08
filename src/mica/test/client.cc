@@ -1110,72 +1110,71 @@ main(int argc, char **argv)
     //start mica client
     auto config = ::mica::util::Config::load_file("client.json");
 
-      DatagramClientConfig::Network network(config.get("network"));
-      network.start();
-      Client::DirectoryClient dir_client(config.get("dir_client"));
+    DatagramClientConfig::Network network(config.get("network"));
+    network.start();
+    Client::DirectoryClient dir_client(config.get("dir_client"));
 
-      Client client(config.get("client"), &network, &dir_client);
-      client.discover_servers();
-      client.probe_reachability();
+    Client client(config.get("client"), &network, &dir_client);
+    client.discover_servers();
+    client.probe_reachability();
 
-        ResponseHandler rh;
+    ResponseHandler rh;
 
-        size_t num_items = 192 * 1048576;
+    size_t num_items = 192 * 1048576;
 
-        // double get_ratio = 0.95;
-        double get_ratio = 0.50;
+    // double get_ratio = 0.95;
+    double get_ratio = 0.50;
 
-        uint32_t get_threshold = (uint32_t)(get_ratio * (double)((uint32_t)-1));
-        int master = rte_get_master_lcore();
+    uint32_t get_threshold = (uint32_t)(get_ratio * (double)((uint32_t)-1));
+    int master = rte_get_master_lcore();
 
-        ::mica::util::Rand op_type_rand(static_cast<uint64_t>(master) + 1000);
-        ::mica::util::ZipfGen zg(num_items, 0.5,
-                                 static_cast<uint64_t>(master));
-        ::mica::util::Stopwatch sw;
-        sw.init_start();
-        sw.init_end();
+    ::mica::util::Rand op_type_rand(static_cast<uint64_t>(master) + 1000);
+    ::mica::util::ZipfGen zg(num_items, 0.5,
+                     static_cast<uint64_t>(master));
+    ::mica::util::Stopwatch sw;
+    sw.init_start();
+    sw.init_end();
 
-        uint64_t key_i;
-        uint64_t key_hash;
-        size_t key_length = sizeof(key_i);
-        char* key = reinterpret_cast<char*>(&key_i);
+    uint64_t key_i;
+    uint64_t key_hash;
+    size_t key_length = sizeof(key_i);
+    char* key = reinterpret_cast<char*>(&key_i);
 
-        size_t value_length;
-        char* value;
-        size_t rcv_value_length;
-        char* rcv_value;
-
-
-        // bool use_noop = true;
-
-        uint64_t last_handle_response_time = sw.now();
-        // Check the response after sending some requests.
-        // Ideally, packets per batch for both RX and TX should be similar.
-        uint64_t response_check_interval = 20 * sw.c_1_usec();
+    size_t value_length;
+    char* value;
+    size_t rcv_value_length;
+    char* rcv_value;
 
 
-        void* dequeue_output[1];
-        struct rte_ring_item* rcv_item;
-        struct session_state* rcv_state;
-        struct session_state* hash_rcv_state;
-        while (true) {
-          // Determine the operation type.
-          uint32_t op_r = op_type_rand.next_u32();
-          bool is_get = op_r <= get_threshold;
+    // bool use_noop = true;
 
-          // Generate the key.
-          RTE_LCORE_FOREACH_SLAVE(lcore_id){
-         //    if(lcore_id!=num)
-              int flag=1;
-              flag = rte_ring_sc_dequeue(worker2interface[lcore_id], dequeue_output);
-              if(flag==0){
-                  //receive msg from workers
+    uint64_t last_handle_response_time = sw.now();
+    // Check the response after sending some requests.
+    // Ideally, packets per batch for both RX and TX should be similar.
+    uint64_t response_check_interval = 20 * sw.c_1_usec();
 
 
-                  uint64_t now = sw.now();
-                  while (!client.can_request(key_hash) ||
-                         sw.diff_in_cycles(now, last_handle_response_time) >=
-                             response_check_interval) {
+    void* dequeue_output[1];
+    struct rte_ring_item* rcv_item;
+    struct session_state* rcv_state;
+    struct session_state* hash_rcv_state;
+    while (true) {
+        // Determine the operation type.
+        uint32_t op_r = op_type_rand.next_u32();
+        bool is_get = op_r <= get_threshold;
+
+        // Generate the key.
+        RTE_LCORE_FOREACH_SLAVE(lcore_id){
+            //    if(lcore_id!=num)
+            int flag=1;
+            flag = rte_ring_sc_dequeue(worker2interface[lcore_id], dequeue_output);
+            if(flag==0){
+              //receive msg from workers
+
+                uint64_t now = sw.now();
+                while (!client.can_request(key_hash) ||
+                        sw.diff_in_cycles(now, last_handle_response_time) >=
+                        response_check_interval) {
                     last_handle_response_time = now;
                     client.handle_response(rh);
                     rcv_value=rh._value;
@@ -1184,35 +1183,30 @@ main(int argc, char **argv)
                     struct rte_ring_item it(0,0,0,*hash_rcv_state);
                     rte_ring_enqueue(interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));
 
+                }
 
-                  }
+                rcv_item=((struct rte_ring_item*)dequeue_output);
+                key=rcv_item->_key;
+                key_length=rcv_item->_key_length;
+                key_hash=rcv_item->_key_hash;
+                rcv_state=&(rcv_item->_state);
+                if(rcv_state->_action==READ){
+                    //get
+                    client.get(key_hash, key, key_length);
 
+                }else if(rcv_state->_action==WRITE){
+                  //set
+                    value_length= sizeof(rcv_item->_state);
+                    value= reinterpret_cast<char*>(rcv_state);
+                    client.set(key_hash, key, key_length, value, value_length, true);
 
-                  rcv_item=((struct rte_ring_item*)dequeue_output);
-                  key=rcv_item->_key;
-                  key_length=rcv_item->_key_length;
-                  key_hash=rcv_item->_key_hash;
-                  rcv_state=&(rcv_item->_state);
-                  if(rcv_state->_action==READ){
-                      //get
-                      client.get(key_hash, key, key_length);
+                }
 
-                  }else if(rcv_state->_action==WRITE){
-                      //set
-                      value_length= sizeof(rcv_item->_state);
-                      value= reinterpret_cast<char*>(rcv_state);
-                      client.set(key_hash, key, key_length, value, value_length, true);
-
-
-                  }
-
-              }
-
-          }
+            }
 
         }
 
-
+    }
 
     return 0;
 }
