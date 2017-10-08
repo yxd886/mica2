@@ -1093,6 +1093,7 @@ main(int argc, char **argv)
     //rte_eal_mp_remote_launch(main_loop, NULL, CALL_MASTER);
     int num=rte_lcore_count();
 
+    lcore_id=0;
     RTE_LCORE_FOREACH_SLAVE(lcore_id){
    //    if(lcore_id!=num)
         rte_eal_remote_launch(main_loop, NULL, lcore_id);
