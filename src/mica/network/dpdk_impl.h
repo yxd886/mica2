@@ -145,6 +145,151 @@ DPDK<StaticConfig>::DPDK(const ::mica::util::Config& config)
 }
 
 template <class StaticConfig>
+DPDK<StaticConfig>::DPDK(const ::mica::util::Config& config,bool eal_inited)
+    : config_(config), rte_argc_(0), endpoint_count_(0), started_(false) {
+  for (uint16_t numa_id = 0; numa_id < StaticConfig::kMaxNUMACount; numa_id++)
+    mempools_[numa_id] = nullptr;
+
+  assert(::mica::util::lcore.numa_count() <= StaticConfig::kMaxNUMACount);
+
+  uint64_t core_mask = 0;
+  auto lcores_conf = config_.get("lcores");
+  for (size_t i = 0; i < lcores_conf.size(); i++) {
+    auto lcore_id = lcores_conf.get(i).get_uint64();
+    core_mask |= uint64_t(1) << lcore_id;
+  }
+  if(!eal_inited)
+  {
+      init_eal(core_mask);
+  }
+
+
+  {
+    uint16_t num_ports = rte_eth_dev_count();
+    if (StaticConfig::kVerbose)
+      printf("total %" PRIu16 " ports available\n", num_ports);
+
+    ports_.resize(num_ports);
+    for (uint16_t port_id = 0; port_id < num_ports; port_id++)
+      ports_[port_id].valid = false;
+  }
+
+  // Parse configurations.
+  auto ports_conf = config_.get("ports");
+  for (size_t i = 0; i < ports_conf.size(); i++) {
+    auto port_conf = ports_conf.get(i);
+    uint16_t port_id = ::mica::util::safe_cast<uint16_t>(
+        port_conf.get("port_id").get_uint64());
+    assert(port_id < ports_.size());
+
+    uint32_t ipv4_addr = NetworkAddress::parse_ipv4_addr(
+        port_conf.get("ipv4_addr").get_str().c_str());
+
+    ether_addr mac_addr;
+    if (port_conf.get("mac_addr").exists())
+      mac_addr = NetworkAddress::parse_mac_addr(
+          port_conf.get("mac_addr").get_str().c_str());
+    else
+      rte_eth_macaddr_get(static_cast<uint8_t>(port_id), &mac_addr);
+
+    uint16_t numa_id = get_port_numa_id(port_id);
+    assert(numa_id < StaticConfig::kMaxNUMACount);
+
+    ports_[port_id].valid = true;
+    ports_[port_id].mac_addr = mac_addr;
+    ports_[port_id].ipv4_addr = ipv4_addr;
+    ports_[port_id].numa_id = numa_id;
+    ports_[port_id].next_available_queue_id = 0;
+  }
+
+  auto endpoints_conf = config_.get("endpoints");
+  if (endpoints_conf.exists()) {
+    assert(endpoints_conf.size() <= StaticConfig::kMaxEndpointCount);
+    for (size_t i = 0; i < endpoints_conf.size(); i++) {
+      uint16_t lcore_id = ::mica::util::safe_cast<uint16_t>(
+          endpoints_conf.get(i).get(0).get_uint64());
+
+      uint16_t port_id = ::mica::util::safe_cast<uint16_t>(
+          endpoints_conf.get(i).get(1).get_uint64());
+      assert(ports_[port_id].valid);
+
+      add_endpoint(lcore_id, port_id);
+    }
+  } else {
+    uint16_t next_lcore_id[StaticConfig::kMaxNUMACount] = {
+        0,
+    };
+    for (uint16_t port_id = 0; port_id < ports_.size(); port_id++) {
+      if (!ports_[port_id].valid) continue;
+
+      uint16_t endpoint_count = 0;
+
+      struct rte_eth_link link;
+      while (true) {
+        if (StaticConfig::kVerbose)
+          printf("querying port %" PRIu16 "...\n", port_id);
+
+        rte_eth_link_get(static_cast<uint8_t>(port_id), &link);
+
+        if (!link.link_status) {
+          printf("warning: port %" PRIu16 ": link down; retrying...\n",
+                 port_id);
+          sleep(1);
+          continue;
+        }
+        if (link.link_speed / 1000 < StaticConfig::kMinLinkSpeed) {
+          printf("warning: port %" PRIu16 ": low speed (current: %" PRIu32
+                 " Gbps, minimum: %" PRIu32 " Gbps); retrying...\n",
+                 port_id, link.link_speed / 1000, StaticConfig::kMinLinkSpeed);
+          sleep(1);
+          continue;
+        }
+        break;
+      }
+
+      switch (link.link_speed) {
+        case ETH_SPEED_NUM_10M:
+        case ETH_SPEED_NUM_100M:
+        case ETH_SPEED_NUM_1G:
+        case ETH_SPEED_NUM_10G:
+          endpoint_count = 2;
+          break;
+        case ETH_SPEED_NUM_20G:
+          endpoint_count = 4;
+          break;
+        case ETH_SPEED_NUM_40G:
+          endpoint_count = 8;
+          break;
+        default:
+          if (StaticConfig::kVerbose)
+            printf("unknown link speed for port %" PRIu16 ": %" PRIu32 "\n",
+                   port_id, link.link_speed);
+          endpoint_count = static_cast<uint16_t>(link.link_speed / 5000);
+          break;
+      }
+
+      size_t numa_id = ports_[port_id].numa_id;
+
+      for (uint16_t j = 0; j < endpoint_count; j++) {
+        while (true) {
+          next_lcore_id[numa_id] = static_cast<uint16_t>(
+              next_lcore_id[numa_id] % ::mica::util::lcore.lcore_count());
+          if (::mica::util::lcore.numa_id(next_lcore_id[numa_id]) != numa_id)
+            next_lcore_id[numa_id]++;
+          else
+            break;
+        }
+
+        add_endpoint(next_lcore_id[numa_id]++, port_id);
+      }
+    }
+  }
+
+  init_mempool();
+}
+
+
+template <class StaticConfig>
 DPDK<StaticConfig>::~DPDK() {
   if (started_) stop();
 

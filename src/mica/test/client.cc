@@ -915,7 +915,7 @@ main(int argc, char **argv)
     unsigned lcore_id;
     uint32_t n_tx_queue, nb_lcores;
     uint8_t portid, nb_rx_queue, queue, socketid;
-    ::mica::util::lcore.pin_thread(0);
+    //::mica::util::lcore.pin_thread(0);
     port_config();
 
     /* init EAL */
@@ -937,7 +937,8 @@ main(int argc, char **argv)
     if (ret < 0)
         rte_exit(EXIT_FAILURE, "init_lcore_rx_queues failed\n");
 
-    nb_ports = rte_eth_dev_count();
+    nb_ports = rte_eth_dev_count(); //leave one port for mica
+    printf("number of port: %d\n",nb_ports);
 
     if (check_port_config(nb_ports) < 0)
         rte_exit(EXIT_FAILURE, "check_port_config failed\n");
