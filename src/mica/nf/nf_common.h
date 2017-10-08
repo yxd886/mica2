@@ -47,7 +47,7 @@ class ResponseHandler
     (void)value;
     (void)value_length;
     (void)arg;
-    _value=value;
+    _value=(char*)value;
     _value_length=value_length;
 
   }
