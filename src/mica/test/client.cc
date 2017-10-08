@@ -899,33 +899,6 @@ void port_config(){
 
 //for mica
 
-struct DPDKConfig : public ::mica::network::BasicDPDKConfig {
-  static constexpr bool kVerbose = true;
-};
-
-
-
-typedef ::mica::datagram::DatagramClient<DatagramClientConfig> Client;
-
-typedef ::mica::table::Result Result;
-
-
-
-class ResponseHandler
-    : public ::mica::datagram::ResponseHandlerInterface<Client> {
- public:
-  void handle(Client::RequestDescriptor rd, Result result, const char* value,
-              size_t value_length, const Argument& arg) {
-    (void)rd;
-    (void)result;
-    (void)value;
-    (void)value_length;
-    (void)arg;
-  }
-};
-
-
-
 
 int
 main(int argc, char **argv)
