@@ -170,6 +170,7 @@ class DPDK : public PacketIOInterface {
   // static constexpr uint16_t kMaxBurstSize = StaticConfig::kMaxBurstSize;
 
   DPDK(const ::mica::util::Config& config);
+  DPDK(const ::mica::util::Config& config,bool eal_inited);
   ~DPDK();
 
   std::vector<EndpointId> get_endpoints() const;
