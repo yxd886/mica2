@@ -1092,8 +1092,9 @@ main(int argc, char **argv)
     /* launch per-lcore init on every lcore */
     //rte_eal_mp_remote_launch(main_loop, NULL, CALL_MASTER);
     int num=rte_lcore_count();
-    for(int i=1;i<num;i++){
-        rte_eal_remote_launch(main_loop,NULL,i);
+    RTE_LCORE_FOREACH_SLAVE(lcore_id) {
+       if(lcore_id!=num)
+        rte_eal_remote_launch(main_loop, NULL, lcore_id);
     }
 
     RTE_LCORE_FOREACH_SLAVE(lcore_id) {
