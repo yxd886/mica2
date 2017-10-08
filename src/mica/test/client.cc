@@ -1099,18 +1099,12 @@ main(int argc, char **argv)
     }
   //  rte_eal_mp_remote_launch(main_loop, NULL, CALL_MASTER);
 
-    RTE_LCORE_FOREACH_SLAVE(lcore_id) {
-        if (rte_eal_wait_lcore(lcore_id) < 0) {
-            ret = -1;
-            break;
-        }
-    }
 
 
     //start mica client
     auto config = ::mica::util::Config::load_file("client.json");
 
-    DatagramClientConfig::Network network(config.get("network"));
+    DatagramClientConfig::Network network(config.get("network"),true);
     network.start();
     Client::DirectoryClient dir_client(config.get("dir_client"));
 
