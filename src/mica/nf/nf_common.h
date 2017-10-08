@@ -17,7 +17,7 @@
 typedef ::mica::alloc::HugeTLBFS_SHM Alloc;
 
 struct DPDKConfig : public ::mica::network::BasicDPDKConfig {
-    static constexpr bool kVerbose = true;
+  static constexpr bool kVerbose = true;
 };
 
 struct DatagramClientConfig
@@ -34,8 +34,21 @@ typedef ::mica::table::Result Result;
 
 template <typename T>
 static uint64_t hash(const T* key, size_t key_length) {
-    return ::mica::util::hash(key, key_length);
+  return ::mica::util::hash(key, key_length);
 }
+
+class ResponseHandler
+    : public ::mica::datagram::ResponseHandlerInterface<Client> {
+ public:
+  void handle(Client::RequestDescriptor rd, Result result, const char* value,
+              size_t value_length, const Argument& arg) {
+    (void)rd;
+    (void)result;
+    (void)value;
+    (void)value_length;
+    (void)arg;
+  }
+};
 
 struct rule{
 public:

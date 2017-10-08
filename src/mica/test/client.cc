@@ -903,22 +903,13 @@ struct DPDKConfig : public ::mica::network::BasicDPDKConfig {
   static constexpr bool kVerbose = true;
 };
 
-struct DatagramClientConfig
-    : public ::mica::datagram::BasicDatagramClientConfig {
-  typedef ::mica::network::DPDK<DPDKConfig> Network;
-  // static constexpr bool kSkipRX = true;
-  // static constexpr bool kIgnoreServerPartition = true;
-  // static constexpr bool kVerbose = true;
-};
+
 
 typedef ::mica::datagram::DatagramClient<DatagramClientConfig> Client;
 
 typedef ::mica::table::Result Result;
 
-template <typename T>
-static uint64_t hash(const T* key, size_t key_length) {
-  return ::mica::util::hash(key, key_length);
-}
+
 
 class ResponseHandler
     : public ::mica::datagram::ResponseHandlerInterface<Client> {
