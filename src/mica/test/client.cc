@@ -915,6 +915,7 @@ main(int argc, char **argv)
     unsigned lcore_id;
     uint32_t n_tx_queue, nb_lcores;
     uint8_t portid, nb_rx_queue, queue, socketid;
+    ::mica::util::lcore.pin_thread(0);
     port_config();
 
     /* init EAL */
@@ -1093,7 +1094,7 @@ main(int argc, char **argv)
     //rte_eal_mp_remote_launch(main_loop, NULL, CALL_MASTER);
     int num=rte_lcore_count();
 
-    lcore_id=0;
+    //lcore_id=0;
     RTE_LCORE_FOREACH_SLAVE(lcore_id){
    //    if(lcore_id!=num)
         rte_eal_remote_launch(main_loop, NULL, lcore_id);
