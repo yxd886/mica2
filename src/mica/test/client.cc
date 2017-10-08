@@ -1210,25 +1210,6 @@ main(int argc, char **argv)
 
           }
 
-
-
-          if (!use_noop) {
-            if (is_get)
-              client.get(key_hash, key, key_length);
-            else {
-              value_i = seq;
-              client.set(key_hash, key, key_length, value, value_length, true);
-            }
-          } else {
-            if (is_get)
-              client.noop_read(key_hash, key, key_length);
-            else {
-              value_i = seq;
-              client.noop_write(key_hash, key, key_length, value, value_length);
-            }
-          }
-
-          seq++;
         }
 
 
