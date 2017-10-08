@@ -152,8 +152,8 @@ IF(LTO)
   ADD_EXECUTABLE(test_zipf src/mica/test/test_zipf.cc ${SOURCES})
   TARGET_LINK_LIBRARIES(test_zipf ${LIBRARIES})
 
-  ADD_EXECUTABLE(test_prefetch src/mica/test/test_prefetch.cc ${SOURCES})
-  TARGET_LINK_LIBRARIES(test_prefetch ${LIBRARIES})
+  ADD_EXECUTABLE(client src/mica/test/client.cc ${SOURCES})
+  TARGET_LINK_LIBRARIES(client ${LIBRARIES})
 
   ADD_EXECUTABLE(test_rand src/mica/test/test_rand.cc ${SOURCES})
   TARGET_LINK_LIBRARIES(test_rand ${LIBRARIES})
@@ -210,8 +210,8 @@ ELSE(LTO)
   ADD_EXECUTABLE(test_zipf src/mica/test/test_zipf.cc)
   TARGET_LINK_LIBRARIES(test_zipf common ${LIBRARIES})
 
-  ADD_EXECUTABLE(test_prefetch src/mica/test/test_prefetch.cc)
-  TARGET_LINK_LIBRARIES(test_prefetch common ${LIBRARIES})
+  ADD_EXECUTABLE(client src/mica/test/client.cc)
+  TARGET_LINK_LIBRARIES(client common ${LIBRARIES})
 
   ADD_EXECUTABLE(test_rand src/mica/test/test_rand.cc ${SOURCES})
   TARGET_LINK_LIBRARIES(test_rand ${LIBRARIES})
