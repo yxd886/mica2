@@ -73,12 +73,22 @@ struct nat_state{
 
 struct session_state{
     uint32_t _action;
+    uint32_t lcore_id;
 
     //firewall state:
     struct firewall_state _firewall_state;
     struct load_balancer_state _load_balancer_state;
     struct nat_state _nat_state;
-    session_state():_action(READ),_firewall_state(),_load_balancer_state(),_nat_state(){}
+    session_state():_action(READ),_firewall_state(),_load_balancer_state(),_nat_state(){
+        lcore_id=rte_lcore_id();
+    }
+    session_state( struct session_state& dst){
+        _action=dst._action;
+        lcore_id=dst.lcore_id;
+        _firewall_state.copy(&(dst._firewall_state));
+        _load_balancer_state.copy(&(dst._load_balancer_state));
+        _nat_state.copy(&(dst._nat_state));
+    }
 
 };
 

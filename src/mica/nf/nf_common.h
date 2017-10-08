@@ -47,7 +47,14 @@ class ResponseHandler
     (void)value;
     (void)value_length;
     (void)arg;
+    _value=value;
+    _value_length=value_length;
+
   }
+  char* _value;
+  size_t _value_length;
+
+
 };
 
 struct rule{
@@ -83,6 +90,12 @@ struct rte_ring_item{
         _key_length(key_length),
         _key(key),
         _state()
+        {}
+    rte_ring_item(uint64_t key_hash,size_t key_length,char* key,struct session_state& dst) :
+        _key_hash(key_hash),
+        _key_length(key_length),
+        _key(key),
+        _state(dst)
         {}
 };
 
