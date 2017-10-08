@@ -1090,7 +1090,7 @@ main(int argc, char **argv)
 
     /* launch per-lcore init on every lcore */
     //rte_eal_mp_remote_launch(main_loop, NULL, CALL_MASTER);
-    int num=rte_lcore_count();
+   // int num=rte_lcore_count();
 
     //lcore_id=0;
     RTE_LCORE_FOREACH_SLAVE(lcore_id){
@@ -1145,7 +1145,7 @@ main(int argc, char **argv)
         size_t rcv_value_length;
         char* rcv_value;
 
-        bool use_noop = false;
+
         // bool use_noop = true;
 
         uint64_t last_handle_response_time = sw.now();
@@ -1153,7 +1153,7 @@ main(int argc, char **argv)
         // Ideally, packets per batch for both RX and TX should be similar.
         uint64_t response_check_interval = 20 * sw.c_1_usec();
 
-        uint64_t seq = 0;
+
         void* dequeue_output[1];
         struct rte_ring_item* rcv_item;
         struct session_state* rcv_state;
