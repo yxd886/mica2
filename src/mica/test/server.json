@@ -1,6 +1,6 @@
 {
   "dir_client": {
-    "etcd_addr": "YOUR_ETCD_HOST",
+    "etcd_addr": "128.45.128.155",
     "etcd_port": 50505
     /*"verbose": true*/
   },
