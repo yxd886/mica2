@@ -98,7 +98,7 @@ clear_huge_pages()
 
 	echo > .echo_tmp
 	for d in /sys/devices/system/node/node? ; do
-		echo "echo 0 > $d/hugepages/hugepages-2048kB/nr_hugepages" >> .echo_tmp
+		echo "echo 0 > $d/hugepages/hugepages-1048576kB/nr_hugepages" >> .echo_tmp
 	done
 	sudo sh .echo_tmp
 	rm -f .echo_tmp
@@ -130,9 +130,9 @@ set_numa_pages()
 		Pages=$1
 		echo -n "Number of pages for $node: $Pages requested, "
 		shift
-		echo "echo $Pages > $d/hugepages/hugepages-2048kB/nr_hugepages" >> .echo_tmp
+		echo "echo $Pages > $d/hugepages/hugepages-1048576kB/nr_hugepages" >> .echo_tmp
 	    sudo sh .echo_tmp
-	    echo "$(cat "$d/hugepages/hugepages-2048kB/nr_hugepages") actual"
+	    echo "$(cat "$d/hugepages/hugepages-1048576kB/nr_hugepages") actual"
 	done
 	rm -f .echo_tmp
 
