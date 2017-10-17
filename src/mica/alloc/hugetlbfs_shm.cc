@@ -471,7 +471,10 @@ void HugeTLBFS_SHM::initialize() {
           }
           printf("page %zu (address %p) has not been unmapped. waiting...\n",
                  page_id, addr);
+          printf("error type: %s\n",
+                 strerror(errno));
           fflush(stdout);
+
           // break;
           // sync();
           // sleep(1);
