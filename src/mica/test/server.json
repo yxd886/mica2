@@ -8,7 +8,7 @@
   "alloc": {
     /*"num_pages_to_free": [1024, 1024]*/
     /*"num_pages_to_free": [1024]*/
-    "num_pages_to_free": [16]
+    /*num_pages_to_free": [16]*/
     /*"verbose": true*/
   },
   "processor": {
