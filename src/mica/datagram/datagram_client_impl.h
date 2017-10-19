@@ -2,7 +2,7 @@
 #ifndef MICA_DATAGRAM_DATAGRAM_CLIENT_IMPL_H_
 #define MICA_DATAGRAM_DATAGRAM_CLIENT_IMPL_H_
 
-#define NOETCD 1
+#define NOETCD 0
 
 namespace mica {
 namespace datagram {
@@ -273,7 +273,7 @@ void DatagramClient<StaticConfig>::directory_proc() {
   if (directory_refresh_interval_ == 0) return;
 
   while (!stopping_) {
-    //update_servers_config();
+    update_servers_config();
 
     // TODO: Use watch instead of get.
     for (uint32_t i = 0; i < directory_refresh_interval_ && !stopping_; i++)
