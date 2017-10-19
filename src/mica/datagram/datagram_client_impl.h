@@ -273,7 +273,7 @@ void DatagramClient<StaticConfig>::directory_proc() {
   if (directory_refresh_interval_ == 0) return;
 
   while (!stopping_) {
-    update_servers_config();
+    //update_servers_config();
 
     // TODO: Use watch instead of get.
     for (uint32_t i = 0; i < directory_refresh_interval_ && !stopping_; i++)
