@@ -9,7 +9,7 @@ Partitions<StaticConfig>::Partitions(const ::mica::util::Config& config,
                                      Alloc* alloc)
     : config_(config), alloc_(alloc) {
   {
-    auto c = config.get("lcores");
+    auto c = config_.get("lcores");
     for (size_t i = 0; i < c.size(); i++) {
       uint16_t lcore_id =
           ::mica::util::safe_cast<uint16_t>(c.get(i).get_uint64());
