@@ -43,7 +43,7 @@ DirectoryClient::DirectoryClient(const ::mica::util::Config& config)
 
   ttl_ = ::mica::util::safe_cast<uint32_t>(config_.get("ttl").get_uint64(2));
 
-  verbose_ = config_.get("verbose").get_bool(true);
+  verbose_ = config_.get("verbose").get_bool(false);
 
   try {
     etcd_client_ = std::make_unique<EtcdClient>(etcd_addr_, etcd_port_);
@@ -67,7 +67,7 @@ std::string DirectoryClient::get_hostname() const { return hostname_; }
 void DirectoryClient::register_server(std::string info) {
   // Allow registering the server multiple times (with new info).
   info_ = info;
-  printf("(etcd_prefix_ + hostname_).c_str():%s",(etcd_prefix_ + "/servers/" + hostname_).c_str());
+  //printf("(etcd_prefix_ + hostname_).c_str():%s",(etcd_prefix_ + "/servers/" + hostname_).c_str());
   fflush(stdout);
 
   try {
@@ -101,7 +101,7 @@ void DirectoryClient::refresh_server() const {
 std::vector<std::string> DirectoryClient::get_server_list() const {
   try {
 
-	printf("geting server lists\n");
+	//printf("geting server lists\n");
 	std::string prefix = etcd_prefix_ + "/servers/";
     auto reply = etcd_client_->Get((prefix).c_str());
 
