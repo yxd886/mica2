@@ -27,6 +27,7 @@ int main() {
   Server::DirectoryClient dir_client(config.get("dir_client"));
 
   DatagramServerConfig::Processor::Alloc alloc(config.get("alloc"));
+  printf("alloc success\n");
   DatagramServerConfig::Processor processor(config.get("processor"), &alloc);
 
   DatagramServerConfig::Network network(config.get("network"));
