@@ -473,6 +473,7 @@ void HugeTLBFS_SHM::initialize() {
                  page_id, addr);
           printf("error type:%d, %s\n",
                  errno,strerror(errno));
+          getchar();
           fflush(stdout);
 
           // break;
