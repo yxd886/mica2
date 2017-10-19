@@ -116,6 +116,7 @@ std::string Curl::Set(const std::string& url, const std::string& type,
   _ResetHandle();
   _SetPostOptions(url, type, options);
   printf("before set curl_easy_perform\n");
+  printf("url:%s\n",url.c_str());
   CURLcode err = curl_easy_perform(handle_);
   _CheckError(err, "easy perform");
 
