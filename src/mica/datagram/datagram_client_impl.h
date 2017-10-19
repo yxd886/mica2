@@ -2,6 +2,8 @@
 #ifndef MICA_DATAGRAM_DATAGRAM_CLIENT_IMPL_H_
 #define MICA_DATAGRAM_DATAGRAM_CLIENT_IMPL_H_
 
+#define NOETCD 1
+
 namespace mica {
 namespace datagram {
 template <class StaticConfig>
@@ -74,6 +76,58 @@ DatagramClient<StaticConfig>::~DatagramClient() {
 template <class StaticConfig>
 void DatagramClient<StaticConfig>::discover_servers(size_t min_servers) {
   std::vector<std::string> server_list;
+  if(NOETCD==1){
+	    servers_.push_back(Server());
+	    auto& s = servers_.back();
+	    s.server_name = "server1";
+	    std::string si("{\"concurrent_read\":false, \"concurrent_write\":false, \"partitions\":[[0,0],[1,1]], \"endpoints\":[[0,0,\"3c:fd:fe:06:09:60\",\"10.0.0.1\",0],[1,1,\"3c:fd:fe:06:09:60\",\"10.0.0.1\",1]]}");
+	    auto si_conf =
+	        ::mica::util::Config::load(si, std::string() + "(" + s.server_name + ")");
+	    s.concurrent_read = si_conf.get("concurrent_read").get_bool() ? 1 : 0;
+	    s.concurrent_write = si_conf.get("concurrent_write").get_bool() ? 1 : 0;
+
+	    s.partition_count = static_cast<uint16_t>(si_conf.get("partitions").size());
+
+	    auto partitions_conf = si_conf.get("partitions");
+	    for (size_t i = 0; i < partitions_conf.size(); i++) {
+	      auto& p = s.partitions[i];
+
+	      uint16_t partition_id = ::mica::util::safe_cast<uint16_t>(
+	          partitions_conf.get(i).get(0).get_uint64());
+	      // We only support a dense list of partition IDs now.
+	      assert(i == partition_id);
+	      (void)partition_id;
+
+	      p.owner_lcore_id = ::mica::util::safe_cast<uint16_t>(
+	          partitions_conf.get(i).get(1).get_uint64());
+	    }
+
+	    s.endpoint_count = static_cast<uint16_t>(si_conf.get("endpoints").size());
+
+	    auto endpoints_conf = si_conf.get("endpoints");
+	    for (size_t i = 0; i < endpoints_conf.size(); i++) {
+	      auto& e = s.endpoints[i];
+
+	      e.eid = ::mica::util::safe_cast<uint16_t>(
+	          endpoints_conf.get(i).get(0).get_uint64());
+	      e.owner_lcore_id = ::mica::util::safe_cast<uint16_t>(
+	          endpoints_conf.get(i).get(1).get_uint64());
+	      e.mac_addr = ::mica::network::NetworkAddress::parse_mac_addr(
+	          endpoints_conf.get(i).get(2).get_str().c_str());
+	      e.ipv4_addr = ::mica::network::NetworkAddress::parse_ipv4_addr(
+	          endpoints_conf.get(i).get(3).get_str().c_str());
+	      e.udp_port = ::mica::util::safe_cast<uint16_t>(
+	          endpoints_conf.get(i).get(4).get_uint64());
+	    }
+
+	    printf("%zu partitions and %zu endpoints on server %s\n",
+	           partitions_conf.size(), endpoints_conf.size(), server_name.c_str());
+	    printf("%zu servers discovered\n", 1);
+
+	    directory_thread_ = std::thread(directory_proc_wrapper, this);
+
+	  return;
+  }
 
   while (true) {
     server_list = dir_client_->get_server_list();
