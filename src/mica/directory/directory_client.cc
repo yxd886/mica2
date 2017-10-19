@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include "mica/util/safe_cast.h"
 #include "mica/directory/directory_client.h"
+#include<iostream>
 
 namespace mica {
 namespace directory {
