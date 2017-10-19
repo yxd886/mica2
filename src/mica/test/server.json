@@ -12,7 +12,7 @@
     /*"verbose": true*/
   },
   "processor": {
-    "lcores": [1],
+    "lcores": [0],
     "partition_count": 2,
 
     "total_size": 4884901888,      /* 12 GiB */
