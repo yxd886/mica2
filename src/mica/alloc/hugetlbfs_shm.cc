@@ -772,6 +772,7 @@ bool HugeTLBFS_SHM::map(size_t entry_id, void* ptr, size_t offset,
     if (ret_p == MAP_FAILED) {
       error = 1;
       fprintf(stderr, "error: mmap failed at %p (error)\n", p);
+      getchar();
       // we can retry with a new free memory region.
       // assert(false);
       break;
