@@ -113,7 +113,9 @@ HugeTLBFS_SHM::HugeTLBFS_SHM(const ::mica::util::Config& config)
       ;
     } else {
       for (size_t i = 0; i < c.size(); i++) {
+    	  printf("c.size:%d\n",c.size());
         size_t page_count = c.get(i).get_uint64();
+        printf("page_count:%d\n",page_count);
         num_pages_to_free_.push_back(page_count);
       }
     }
