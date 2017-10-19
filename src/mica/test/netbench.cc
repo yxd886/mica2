@@ -155,6 +155,7 @@ int main(int argc, const char* argv[]) {
 
   uint16_t lcore_count =
       static_cast<uint16_t>(::mica::util::lcore.lcore_count());
+  printf("lcore num:%d\n",lcore_count);
 
   std::vector<Args> args(lcore_count);
   for (uint16_t lcore_id = 0; lcore_id < lcore_count; lcore_id++) {

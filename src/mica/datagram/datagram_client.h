@@ -77,7 +77,7 @@ struct BasicDatagramClientConfig {
 
   // Ignore partitions within each server to test the server's request
   // redirection capability.
-  static constexpr bool kIgnoreServerPartition = true;
+  static constexpr bool kIgnoreServerPartition = false;
 
   // Be verbose.
   static constexpr bool kVerbose = false;
