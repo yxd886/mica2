@@ -339,7 +339,8 @@ send_single_packet(struct rte_mbuf *m, uint8_t port)
 static void
 l2fwd_simple_forward(struct rte_mbuf *m, unsigned portid)
 {
-    Firewall a(worker2interface,interface2worker);
+    printf("creating firewall\n");
+	Firewall a(worker2interface,interface2worker);
     struct ether_hdr *eth;
     void *tmp;
     unsigned dst_port;
