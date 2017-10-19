@@ -1110,6 +1110,9 @@ main(int argc, char **argv)
 
     Client client(config.get("client"), &network, &dir_client);
     client.discover_servers();
+    int master = rte_get_master_lcore();
+    ::mica::util::lcore.pin_thread(master);
+
     client.probe_reachability();
 
     ResponseHandler rh;
@@ -1120,7 +1123,7 @@ main(int argc, char **argv)
     double get_ratio = 0.50;
 
     uint32_t get_threshold = (uint32_t)(get_ratio * (double)((uint32_t)-1));
-    int master = rte_get_master_lcore();
+
 
     ::mica::util::Rand op_type_rand(static_cast<uint64_t>(master) + 1000);
     ::mica::util::ZipfGen zg(num_items, 0.5,
