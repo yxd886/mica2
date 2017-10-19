@@ -80,6 +80,7 @@ void DatagramClient<StaticConfig>::discover_servers(size_t min_servers) {
 	    servers_.push_back(Server());
 	    auto& s = servers_.back();
 	    s.server_name = "server1";
+	    std::string server_name(s.server_name);
 	    std::string si("{\"concurrent_read\":false, \"concurrent_write\":false, \"partitions\":[[0,0],[1,1]], \"endpoints\":[[0,0,\"3c:fd:fe:06:09:60\",\"10.0.0.1\",0],[1,1,\"3c:fd:fe:06:09:60\",\"10.0.0.1\",1]]}");
 	    auto si_conf =
 	        ::mica::util::Config::load(si, std::string() + "(" + s.server_name + ")");
