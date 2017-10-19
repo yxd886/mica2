@@ -32,6 +32,7 @@ DirectoryClient::DirectoryClient(const ::mica::util::Config& config)
       }
       hostname_ = buf;
     }
+    std::cout<<"hostname: "<<hostname_<<std::endl;
   }
 
   if (config_.get("append_pid").get_bool(true)) {
