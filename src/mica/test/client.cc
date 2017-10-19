@@ -1182,6 +1182,7 @@ main(int argc, char **argv)
         RTE_LCORE_FOREACH_SLAVE(lcore_id){
             //    if(lcore_id!=num)
             int flag=1;
+            printf("dequeueing from ring %d\n",lcore_id);
             flag = rte_ring_sc_dequeue(worker2interface[lcore_id], dequeue_output);
             if(flag==0){
               //receive msg from workers
