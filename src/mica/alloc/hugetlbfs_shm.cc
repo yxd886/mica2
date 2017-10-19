@@ -269,6 +269,7 @@ void HugeTLBFS_SHM::initialize() {
 
     if (p == MAP_FAILED) {
       unlink(path);
+      printf("MAP_FAILED at page_id:%d\n",page_id);
       break;
     }
 
@@ -462,7 +463,7 @@ void HugeTLBFS_SHM::initialize() {
         (void)ret;
 
         // wait until the page is fully freed.
-        while (true) {
+       /* while (true) {
           // printf("checking if page %zu (address %p) has not been
           // unmapped.\n",
           //        page_id, addr);
@@ -482,7 +483,7 @@ void HugeTLBFS_SHM::initialize() {
           // break;
           // sync();
           // sleep(1);
-        }
+        }*/
 
         char path[PATH_MAX];
         make_path(pages_[page_id].file_id, path);
