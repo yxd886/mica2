@@ -52,7 +52,7 @@
     ],
 
     /*"dpdk_args": ["-n", "4", "--socket-mem=2048,2048"]*/
-    "dpdk_args": ["-n", "4", "--socket-mem=1000,1000"]
+    "dpdk_args": ["-n", "4", "--socket-mem=1000"]
   },
 
   "client": {}
