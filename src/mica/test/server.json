@@ -8,20 +8,10 @@
   "alloc": {
     /*"num_pages_to_free": [1024, 1024]*/
     /*"num_pages_to_free": [1024]*/
-    num_pages_to_free": [4]
+    "num_pages_to_free": [4]
     /*"verbose": true*/
   },
   "processor": {
-    /*"lcores": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
-    "partition_count": 56,*/
-    /*"lcores": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-    "partition_count": 48,*/
-    /*"lcores": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
-    "partition_count": 40,*/
-    /*"lcores": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-    "partition_count": 32,*/
-    /*"lcores": [0, 2],
-    "partition_count": 4,*/
     "lcores": [0, 1],
     "partition_count": 2,
 
@@ -29,11 +19,9 @@
     "total_item_count": 71326592,  /* 192 Mi */
 
     "concurrent_read": false,
-    /*"concurrent_read": true,*/
-    "concurrent_write": false
-    /*"concurrent_write": true,*/
 
-    /*"stage_gap": 2*/
+    "concurrent_write": false
+
   },
 
   "network": {
