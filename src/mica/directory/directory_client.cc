@@ -100,7 +100,9 @@ void DirectoryClient::refresh_server() const {
 
 std::vector<std::string> DirectoryClient::get_server_list() const {
   try {
-    std::string prefix = etcd_prefix_ + "/servers/";
+
+	printf("geting server lists\n");
+	std::string prefix = etcd_prefix_ + "/servers/";
     auto reply = etcd_client_->Get((prefix).c_str());
 
     if (verbose_)
