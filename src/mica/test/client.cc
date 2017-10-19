@@ -886,10 +886,12 @@ check_all_ports_link_status(uint8_t port_num, uint32_t port_mask)
 void prepare_rte_ring(){
 
 	for(int i=0; i<10; i++){
-		worker2interface[i] = rte_ring_create("worker2interface"+std::to_string(i), 1024,
+
+
+		worker2interface[i] = rte_ring_create(("worker2interface"+std::to_string(i)).c_str(), 1024,
                         rte_socket_id(), RING_F_SC_DEQ | RING_F_SP_ENQ);
 
-		interface2worker[i] = rte_ring_create("worker2interface"+std::to_string(i), 1024,
+		interface2worker[i] = rte_ring_create(("worker2interface"+std::to_string(i)).c_str(), 1024,
                         rte_socket_id(), RING_F_SC_DEQ | RING_F_SP_ENQ);
 	}
 
