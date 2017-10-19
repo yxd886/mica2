@@ -882,6 +882,19 @@ check_all_ports_link_status(uint8_t port_num, uint32_t port_mask)
     }
 }
 
+
+void prepare_rte_ring(){
+
+	for(int i=0; i<10; i++){
+		worker2interface[i] = rte_ring_create("worker2interface"+std::to_string(i), 1024,
+                        rte_socket_id(), RING_F_SC_DEQ | RING_F_SP_ENQ);
+
+		interface2worker[i] = rte_ring_create("worker2interface"+std::to_string(i), 1024,
+                        rte_socket_id(), RING_F_SC_DEQ | RING_F_SP_ENQ);
+	}
+
+}
+
 void port_config(){
     port_conf.rxmode.mq_mode    = ETH_MQ_RX_RSS,
     port_conf.rxmode.max_rx_pkt_len = ETHER_MAX_LEN,
@@ -915,6 +928,7 @@ main(int argc, char **argv)
     //::mica::util::lcore.pin_thread(0);
     port_config();
 
+
     /* init EAL */
     ret = rte_eal_init(argc, argv);
     if (ret < 0)
@@ -945,6 +959,7 @@ main(int argc, char **argv)
     //    rte_exit(EXIT_FAILURE, "app_acl_init failed\n");
 
     nb_lcores = rte_lcore_count();
+    prepare_rte_ring();
 
     /* initialize all ports */
     for (portid = 0; portid < nb_ports; portid++) {
