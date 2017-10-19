@@ -29,11 +29,15 @@ int main() {
   DatagramServerConfig::Processor::Alloc alloc(config.get("alloc"));
   printf("alloc success\n");
   DatagramServerConfig::Processor processor(config.get("processor"), &alloc);
+  printf("processor success\n");
 
   DatagramServerConfig::Network network(config.get("network"));
+  printf("network success\n");
   network.start();
+  printf("network start success\n");
 
   Server server(config.get("server"), &processor, &network, &dir_client);
+  printf("server success\n");
   server.run();
 
   network.stop();
