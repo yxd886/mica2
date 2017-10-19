@@ -80,7 +80,7 @@ class HugeTLBFS_SHM {
 
   void* malloc_contiguous_any(size_t size);
 
-  static constexpr size_t kPageSize = 2 * 1048576;
+  static constexpr size_t kPageSize =1048576*1024;
 
   struct Page {
     size_t file_id;  // ID used for path generation.
