@@ -149,7 +149,7 @@ HugeTLBFS_SHM::HugeTLBFS_SHM(const ::mica::util::Config& config)
   clean_other_files_on_init_ =
       config.get("clean_other_files_on_init").get_bool(true);
 
-  verbose_ = config.get("verbose").get_bool(false);
+  verbose_ = config.get("verbose").get_bool(true);
 
   initialize();
 }
