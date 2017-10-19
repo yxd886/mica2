@@ -136,7 +136,9 @@ void DatagramServer<StaticConfig>::run() {
 
   for (uint16_t lcore_id = 1; lcore_id < lcore_count; lcore_id++) {
     if (!rte_lcore_is_enabled(static_cast<uint8_t>(lcore_id))) continue;
+    printf("lcore %d run",lcore_id);
     rte_eal_remote_launch(worker_proc_wrapper, &args[lcore_id], lcore_id);
+
   }
   worker_proc_wrapper(&args[0]);
 
