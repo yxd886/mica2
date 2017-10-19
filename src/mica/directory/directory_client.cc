@@ -43,7 +43,7 @@ DirectoryClient::DirectoryClient(const ::mica::util::Config& config)
 
   ttl_ = ::mica::util::safe_cast<uint32_t>(config_.get("ttl").get_uint64(2));
 
-  verbose_ = config_.get("verbose").get_bool(false);
+  verbose_ = config_.get("verbose").get_bool(true);
 
   try {
     etcd_client_ = std::make_unique<EtcdClient>(etcd_addr_, etcd_port_);
