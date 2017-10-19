@@ -14,7 +14,8 @@
 
 namespace mica {
 namespace util {
-thread_local size_t LCore::this_lcore_id_ = LCore::kUnknown;
+//thread_local size_t LCore::this_lcore_id_ = LCore::kUnknown;
+thread_local size_t LCore::this_lcore_id_ = rte_lcore_id();
 
 LCore::LCore() {
   numa_count_ = static_cast<size_t>(numa_num_configured_nodes());
