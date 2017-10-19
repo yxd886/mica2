@@ -613,6 +613,7 @@ size_t HugeTLBFS_SHM::alloc(size_t length, size_t numa_node) {
     entries_.push_back(Entry{0, false, 0, 0, std::vector<size_t>()});
 
   size_t num_pages = (length + (kPageSize - 1)) / kPageSize;
+  printf("num_pages: %d\n",num_pages);
   entries_[entry_id].length = length;
   entries_[entry_id].num_pages = num_pages;
   size_t num_allocated_pages = 0;
@@ -622,8 +623,11 @@ size_t HugeTLBFS_SHM::alloc(size_t length, size_t numa_node) {
     if (num_allocated_pages == num_pages) break;
 
     if (pages_[page_id].addr == nullptr) continue;
-    if (pages_[page_id].in_use || pages_[page_id].numa_node != numa_node)
-      continue;
+    if (pages_[page_id].in_use || pages_[page_id].numa_node != numa_node){
+    	printf("pages_[page_id].in_use || pages_[page_id].numa_node != numa_node\n");
+    	 continue;
+    }
+
 
     assert(entries_[entry_id].page_ids.size() == num_allocated_pages);
     entries_[entry_id].page_ids.push_back(page_id);
