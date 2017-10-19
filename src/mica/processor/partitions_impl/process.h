@@ -119,6 +119,7 @@ void Partitions<StaticConfig>::process(RequestAccessor& ra) {
       auto owner_lcore_id = owner_lcore_ids_[partition_id];
 
       bool accept;
+      printf("owner_locre_id: %d, lcore_id: %d",owner_lcore_id,lcore_id);
       switch (operation) {
         case Operation::kNoopRead:
         case Operation::kGet:
