@@ -11,7 +11,9 @@ namespace mica {
 namespace directory {
 DirectoryClient::DirectoryClient(const ::mica::util::Config& config)
     : config_(config), registered_(false) {
-  etcd_addr_ = config_.get("etcd_addr").get_str("202.45.128.155");
+  //etcd_addr_ = config_.get("etcd_addr").get_str("202.45.128.155");
+	etcd_addr_ = config_.get("etcd_addr");
+  std::cout<<"etcd_addr: "<<etcd_addr_<<std::endl;
   etcd_port_ = ::mica::util::safe_cast<uint16_t>(
       config_.get("etcd_port").get_uint64(2379));
   etcd_prefix_ = config_.get("etcd_prefix").get_str("/mica");
