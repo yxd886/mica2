@@ -110,6 +110,7 @@ HugeTLBFS_SHM::HugeTLBFS_SHM(const ::mica::util::Config& config)
   {
     auto c = config.get("num_pages_to_free");
     if (!c.exists()) {
+    	printf("c doesn't exists\n");
       ;
     } else {
       for (size_t i = 0; i < c.size(); i++) {
