@@ -120,6 +120,7 @@ void DatagramServer<StaticConfig>::run() {
   // Register at the directory and keep it updated.
   stopping_ = false;
   dir_client_->register_server(server_info_.c_str());
+  printf("register server success");
   directory_thread_ = std::thread(directory_proc_wrapper, this);
 
   reset_status();
