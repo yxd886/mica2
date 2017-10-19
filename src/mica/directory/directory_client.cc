@@ -67,7 +67,7 @@ std::string DirectoryClient::get_hostname() const { return hostname_; }
 void DirectoryClient::register_server(std::string info) {
   // Allow registering the server multiple times (with new info).
   info_ = info;
-  printf("(etcd_prefix_ + "/servers/" + hostname_).c_str():%s",(etcd_prefix_ + "/servers/" + hostname_).c_str());
+  printf("(etcd_prefix_ + hostname_).c_str():%s",(etcd_prefix_ + "/servers/" + hostname_).c_str());
 
   try {
     auto reply = etcd_client_->Set(
