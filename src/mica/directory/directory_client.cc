@@ -72,7 +72,7 @@ void DirectoryClient::register_server(std::string info) {
     auto reply = etcd_client_->Set(
         (etcd_prefix_ + "/servers/" + hostname_).c_str(), info_.c_str(), ttl_);
 
-    if (verbose_)
+    if (true)
       printf("DirectoryClient::register_server(): %s\n",
              reply.body().dump().c_str());
   } catch (...) {
