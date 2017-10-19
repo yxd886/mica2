@@ -854,7 +854,7 @@ try:
     url_ = ostr.str();
     ostr << "/v2/keys";
     url_prefix_ = ostr.str();
-    printf("curl handler: %s",ostr.str().c_str());
+   // printf("curl handler: %s",ostr.str().c_str());
 } catch (const std::exception& e) {
     throw ClientException(e.what());
 }
