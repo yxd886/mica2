@@ -104,6 +104,7 @@ public:
 	        rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
 	        void* rev_item;
 	        rev_item=get_value(_interface2worker[lcore_id]);
+	        printf("get value success\n");
 	        struct session_state* ses_state=nullptr;
 
 	        if(rev_item==nullptr){ //new session

@@ -145,6 +145,7 @@ void* poll_interface2worker_ring(struct rte_ring* interface2worker_ring){
 }
 
 void* get_value(struct rte_ring* interface2worker_ring){
+
     return poll_interface2worker_ring(interface2worker_ring);
 }
 

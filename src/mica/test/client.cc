@@ -1230,7 +1230,7 @@ main(int argc, char **argv)
                 }
 
             }else{
-            	printf("nothing in worker2interface[%d]\n",lcore_id);
+            	//printf("nothing in worker2interface[%d]\n",lcore_id);
             }
 
         }
