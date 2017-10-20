@@ -1224,6 +1224,7 @@ main(int argc, char **argv)
 
                 }else if(rcv_state->_action==WRITE){
                   //set
+                	printf("WRITE TO SERVER\n");
                     value_length= sizeof(rcv_item->_state);
                     value= reinterpret_cast<char*>(rcv_state);
                     client.set(key_hash, key, key_length, value, value_length, true);
