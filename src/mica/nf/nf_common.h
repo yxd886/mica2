@@ -48,17 +48,17 @@ class ResponseHandler
 
    struct session_state*hash_rcv_state=nullptr;
    char* rcv_value=(char*)value;
-   std::map<uint64_t,uint64_t>::iterator iter;
+   std::map<uint64_t,uint64_t>::iterator iter;
     if(result==::mica::table::Result::kSuccess){
 		hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
 		struct rte_ring_item it(0,0,0,*hash_rcv_state);
-		rte_ring_enqueue(interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));
+		rte_ring_enqueue(_interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));
 
 		iter=_lcore_map->find(key_hash);
 		_lcore_map->erase(iter);
     }else{
 
-    	rte_ring_enqueue(interface2worker[(*_lcore_map)[key_hash]],static_cast<void*>(nullptr));
+    	rte_ring_enqueue(_interface2worker[(*_lcore_map)[key_hash]],static_cast<void*>(nullptr));
     }
 
 
