@@ -140,6 +140,10 @@ public:
 	            if(DEBUG==1)  printf("try to enqueue to _worker2interface[%d] \n",lcore_id);
 	            rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
 	            if(DEBUG==1)  printf("enqueue to _worker2interface[%d] completed\n",lcore_id);
+
+		        if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
+		        rev_item=get_value(_interface2worker[lcore_id]);
+		        if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
 	        }
 
 	        if(ses_state->_firewall_state._pass==true){

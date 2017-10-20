@@ -70,7 +70,7 @@ class ResponseHandler
    struct session_state*hash_rcv_state=nullptr;
    char* rcv_value=(char*)value;
    std::map<uint64_t,uint64_t>::iterator iter;
-    if(result==::mica::table::Result::kSuccess){
+    if(result==::mica::table::Result::kSuccess||result==::mica::table::Result::setSuccess){
 
 		if(DEBUG==1) printf("result==::mica::table::Result::kSuccess\n");
     	hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
@@ -82,12 +82,19 @@ class ResponseHandler
 
 		iter=_lcore_map->find(key_hash);
 		_lcore_map->erase(iter);
-    }else if(result==::mica::table::Result::setSuccess){
-    	if(DEBUG==1) printf("WRITE SUCCESS\n");
+
+		if(result==::mica::table::Result::setSuccess){
+			if(DEBUG==1) printf("WRITE SUCCESS\n");
+		}
+
+
     }else if(result==::mica::table::Result::kNotFound){
     	if(DEBUG==1) printf("NOT FIND THE KEY FROM SERVER\n");
-
+		if(DEBUG==1) printf("try to enqueue to _interface2worker[%d]\n",(*_lcore_map)[key_hash]);
     	rte_ring_enqueue(_interface2worker[(*_lcore_map)[key_hash]],static_cast<void*>(nullptr));
+		if(DEBUG==1) printf("enqueue to _interface2worker[%d] completed\n",(*_lcore_map)[key_hash]);
+
+
     }else if(result==::mica::table::Result::kPartialValue){
     	if(DEBUG==1) printf("result==::mica::table::Result::kPartialValue\n");
     }else if(result==::mica::table::Result::kError){
