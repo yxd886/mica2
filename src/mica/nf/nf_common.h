@@ -83,10 +83,18 @@ class ResponseHandler
 		_lcore_map->erase(iter);
     }else if(result==::mica::table::Result::setSuccess){
     	if(DEBUG==1) printf("WRITE SUCCESS\n");
-    }else{
+    }else if(result==::mica::table::Result::kNotFound){
     	if(DEBUG==1) printf("NOT FIND THE KEY FROM SERVER\n");
 
     	rte_ring_enqueue(_interface2worker[(*_lcore_map)[key_hash]],static_cast<void*>(nullptr));
+    }else if(result==::mica::table::Result::kPartialValue){
+    	if(DEBUG==1) printf("result==::mica::table::Result::kPartialValue\n");
+    }else if(result==::mica::table::Result::kError){
+    	if(DEBUG==1) printf("result==::mica::table::Result::kError\n");
+    }else if(result==::mica::table::Result::kExists){
+    	if(DEBUG==1) printf("result==::mica::table::Result::kExists\n");
+    }else if(result==::mica::table::Result::kInsufficientSpace){
+    	if(DEBUG==1) printf("result==::mica::table::Result::kInsufficientSpace\n");
     }
 
 
