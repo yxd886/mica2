@@ -91,7 +91,7 @@ Result LTable<StaticConfig>::set(uint64_t key_hash, const char* key,
 
         unlock_bucket(bucket);
 
-        return Result::kSuccess;
+        return Result::setSuccess;
       }
     }
   }
@@ -149,7 +149,7 @@ Result LTable<StaticConfig>::set(uint64_t key_hash, const char* key,
 
   stat_inc(&Stats::count);
 
-  return Result::kSuccess;
+  return Result::setSuccess;
 }
 }
 }
