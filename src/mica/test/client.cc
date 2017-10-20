@@ -1122,7 +1122,7 @@ main(int argc, char **argv)
     }
   //  rte_eal_mp_remote_launch(main_loop, NULL, CALL_MASTER);
 
-    printf("master core ready to run mica client\n");
+    if(DEBUG==1) printf("master core ready to run mica client\n");
 
     //start mica client
     auto config = ::mica::util::Config::load_file("client.json");
@@ -1204,7 +1204,7 @@ main(int argc, char **argv)
             if(flag==0){
               //receive msg from workers
 
-            	printf("received a msg from worker2interface[%d]\n",lcore_id);
+            	if(DEBUG==1)	printf("received a msg from worker2interface[%d]\n",lcore_id);
 
                 rcv_item=((struct rte_ring_item*)dequeue_output[0]);
                 key=rcv_item->_key;
@@ -1216,20 +1216,20 @@ main(int argc, char **argv)
 
                 if(rcv_state->_action==READ){
                     //get
-                	printf("READING FROM SERVER\n");
-                	printf("key_hash:%d, key_length:%d, key:0x%x\n",key_hash,key_length,key);
+                	if(DEBUG==1)	printf("READING FROM SERVER\n");
+                	if(DEBUG==1)	printf("key_hash:%d, key_length:%d, key:0x%x\n",key_hash,key_length,key);
                 	client.get(key_hash, key, key_length);
 
                 }else if(rcv_state->_action==WRITE){
                   //set
-                	printf("WRITE TO SERVER\n");
+                	if(DEBUG==1) 	printf("WRITE TO SERVER\n");
                     value_length= sizeof(rcv_item->_state);
                     value= reinterpret_cast<char*>(rcv_state);
-                    printf("LCORE_ID: %d\n",rcv_state->lcore_id);
+                    if(DEBUG==1)     printf("LCORE_ID: %d\n",rcv_state->lcore_id);
                     client.set(key_hash, key, key_length, value, value_length, true);
 
                 }else{
-                	printf("unrecognized action: %d\n",rcv_state->_action);
+                	if(DEBUG==1)	printf("unrecognized action: %d\n",rcv_state->_action);
                 }
 
 
