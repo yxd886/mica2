@@ -1190,9 +1190,9 @@ main(int argc, char **argv)
                 sw.diff_in_cycles(now, last_handle_response_time) >=
                 response_check_interval) {
             last_handle_response_time = now;
-            printf("master handle_response now\n");
+            //printf("master handle_response now\n");
             client.handle_response(rh);
-            printf("master handle_response finished\n");
+            //printf("master handle_response finished\n");
         }
 
 
@@ -1225,7 +1225,7 @@ main(int argc, char **argv)
                 	printf("WRITE TO SERVER\n");
                     value_length= sizeof(rcv_item->_state);
                     value= reinterpret_cast<char*>(rcv_state);
-                    printf("LCORE_ID: %d",rcv_state->lcore_id);
+                    printf("LCORE_ID: %d\n",rcv_state->lcore_id);
                     client.set(key_hash, key, key_length, value, value_length, true);
 
                 }else{
