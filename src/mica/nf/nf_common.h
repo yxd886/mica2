@@ -78,6 +78,7 @@ class ResponseHandler
 		iter=_lcore_map->find(key_hash);
 		_lcore_map->erase(iter);
     }else{
+    	printf("NOT FIND THE KEY FROM SERVER\n");
 
     	rte_ring_enqueue(_interface2worker[(*_lcore_map)[key_hash]],static_cast<void*>(nullptr));
     }

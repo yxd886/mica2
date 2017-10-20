@@ -18,7 +18,8 @@ public:
     Firewall(struct rte_ring** worker2interface,struct rte_ring** interface2worker):
 		_worker2interface(worker2interface),_interface2worker(interface2worker),_drop(false){
 
-        auto rules_config = ::mica::util::Config::load_file("firewall.json").get("rules");
+        printf("Initializing a firewall\n");
+    	auto rules_config = ::mica::util::Config::load_file("firewall.json").get("rules");
         for (size_t i = 0; i < rules_config.size(); i++) {
             auto rule_conf = rules_config.get(i);
             uint16_t src_port = ::mica::util::safe_cast<uint16_t>(
@@ -99,6 +100,7 @@ public:
 
             //generate rte_ring_item
 	        struct rte_ring_item item(key_hash,key_length,key);
+	        printf("preparing to rte_ring_enqueue \n");
 	        rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
 	        void* rev_item;
 	        rev_item=get_value(_interface2worker[lcore_id]);

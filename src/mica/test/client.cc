@@ -1118,7 +1118,6 @@ main(int argc, char **argv)
 
     //lcore_id=0;
     RTE_LCORE_FOREACH_SLAVE(lcore_id){
-        if(lcore_id!=num-1)
         rte_eal_remote_launch(main_loop, NULL, lcore_id);
     }
   //  rte_eal_mp_remote_launch(main_loop, NULL, CALL_MASTER);
@@ -1215,6 +1214,7 @@ main(int argc, char **argv)
 
                 if(rcv_state->_action==READ){
                     //get
+                	printf("READING FROM SERVER\n");
                     char tmp[1000]={0};
                     memcpy(tmp,key,key_length);
                 	printf("key_hash:%d, key:%s\n",key_hash,tmp);
