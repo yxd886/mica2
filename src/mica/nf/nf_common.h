@@ -73,6 +73,7 @@ class ResponseHandler
 
 		printf("result==::mica::table::Result::kSuccess\n");
     	hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
+
 		struct rte_ring_item it(0,0,0,*hash_rcv_state);
 		printf("enqueue to _interface2worker[%d]\n",hash_rcv_state->lcore_id);
 		rte_ring_enqueue(_interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));

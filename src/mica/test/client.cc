@@ -1225,6 +1225,7 @@ main(int argc, char **argv)
                 	printf("WRITE TO SERVER\n");
                     value_length= sizeof(rcv_item->_state);
                     value= reinterpret_cast<char*>(rcv_state);
+                    printf("LCORE_ID: %d",rcv_state->lcore_id);
                     client.set(key_hash, key, key_length, value, value_length, true);
 
                 }else{
