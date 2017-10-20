@@ -11,6 +11,7 @@
 #include "mica/nf/nf_state.h"
 #include <vector>
 #include <iostream>
+#define DEBUG 1
 
 struct rte_ring_item{
     uint64_t _key_hash;
@@ -71,17 +72,17 @@ class ResponseHandler
    std::map<uint64_t,uint64_t>::iterator iter;
     if(result==::mica::table::Result::kSuccess){
 
-		printf("result==::mica::table::Result::kSuccess\n");
+		if(DEBUG==1) printf("result==::mica::table::Result::kSuccess\n");
     	hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
-    	printf("received value's lcore_id: %d\n",hash_rcv_state->lcore_id);
+    	if(DEBUG==1) printf("received value's lcore_id: %d\n",hash_rcv_state->lcore_id);
 		struct rte_ring_item it(0,0,0,*hash_rcv_state);
-		printf("enqueue to _interface2worker[%d]\n",hash_rcv_state->lcore_id);
+		if(DEBUG==1) printf("enqueue to _interface2worker[%d]\n",hash_rcv_state->lcore_id);
 		rte_ring_enqueue(_interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));
 
 		iter=_lcore_map->find(key_hash);
 		_lcore_map->erase(iter);
     }else{
-    	printf("NOT FIND THE KEY FROM SERVER\n");
+    	if(DEBUG==1) printf("NOT FIND THE KEY FROM SERVER\n");
 
     	rte_ring_enqueue(_interface2worker[(*_lcore_map)[key_hash]],static_cast<void*>(nullptr));
     }

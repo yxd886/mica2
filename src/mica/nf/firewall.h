@@ -18,7 +18,7 @@ public:
     Firewall(struct rte_ring** worker2interface,struct rte_ring** interface2worker):
 		_worker2interface(worker2interface),_interface2worker(interface2worker),_drop(false){
 
-        printf("Initializing a firewall\n");
+    	if(DEBUG==1) printf("Initializing a firewall\n");
     	auto rules_config = ::mica::util::Config::load_file("firewall.json").get("rules");
         for (size_t i = 0; i < rules_config.size(); i++) {
             auto rule_conf = rules_config.get(i);
@@ -101,18 +101,18 @@ public:
             //generate rte_ring_item
 	        struct rte_ring_item item(key_hash,key_length,key);
 
-        	printf("key_hash:%d, key_length:%d, key: ox%x\n",key_hash,key_length,key);
+	        if(DEBUG==1)	printf("key_hash:%d, key_length:%d, key: ox%x\n",key_hash,key_length,key);
 
-	        printf("preparing to _worker2interface[%d] \n",lcore_id);
+	        if(DEBUG==1)  printf("preparing to _worker2interface[%d] \n",lcore_id);
 	        rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
 	        void* rev_item;
 	        rev_item=get_value(_interface2worker[lcore_id]);
-	        printf("get value success\n");
+	        if(DEBUG==1)  printf("get value success\n");
 	        struct session_state* ses_state=nullptr;
 
 	        if(rev_item==nullptr){ //new session
                 //create new state and check whether this session can pass the firewall.
-	        	printf("create new state \n");
+	        	if(DEBUG==1)	printf("create new state \n");
 	            ses_state= new session_state();
 	            ses_state->_action=WRITE;
 	            check_session(&tuple,&(ses_state->_firewall_state));
