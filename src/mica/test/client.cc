@@ -1217,9 +1217,7 @@ main(int argc, char **argv)
                 if(rcv_state->_action==READ){
                     //get
                 	printf("READING FROM SERVER\n");
-                    char tmp[1000]={0};
-                    memcpy(tmp,key,key_length);
-                	printf("key_hash:%d, key_length:%d, key:%s\n",key_hash,key_length,tmp);
+                	printf("key_hash:%d, key_length:%d, key:0x%x\n",key_hash,key_length,key);
                 	client.get(key_hash, key, key_length);
 
                 }else if(rcv_state->_action==WRITE){
