@@ -107,11 +107,13 @@ public:
 
 	        if(DEBUG==1)	printf("key_hash:%d, key_length:%d, key: ox%x\n",key_hash,key_length,key);
 
-	        if(DEBUG==1)  printf("preparing to _worker2interface[%d] \n",lcore_id);
+	        if(DEBUG==1)  printf("try to enqueue to _worker2interface[%d] \n",lcore_id);
 	        rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
+	        if(DEBUG==1)  printf("enqueue to _worker2interface[%d] completed\n",lcore_id);
 	        void* rev_item;
+	        if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
 	        rev_item=get_value(_interface2worker[lcore_id]);
-	        if(DEBUG==1)  printf("get value success\n");
+	        if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
 	        struct session_state* ses_state=nullptr;
 
 	        if(rev_item==nullptr){ //new session
@@ -135,7 +137,9 @@ public:
 
 	            item._state._action=WRITE;
 	            item._state._firewall_state.copy(fw_state);
+	            if(DEBUG==1)  printf("try to enqueue to _worker2interface[%d] \n",lcore_id);
 	            rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
+	            if(DEBUG==1)  printf("enqueue to _worker2interface[%d] completed\n",lcore_id);
 	        }
 
 	        if(ses_state->_firewall_state._pass==true){

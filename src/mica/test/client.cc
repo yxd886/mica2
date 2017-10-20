@@ -1202,11 +1202,16 @@ main(int argc, char **argv)
             //    if(lcore_id!=num)
             int flag=1;
             //printf("dequeueing from ring %d\n",lcore_id);
+
+            //if(DEBUG==1)  printf("try to dequeue to _worker2interface[%d]\n",lcore_id);
             flag = rte_ring_sc_dequeue(worker2interface[lcore_id], dequeue_output);
+
+
+
             if(flag==0){
               //receive msg from workers
 
-            	if(DEBUG==1)	printf("received a msg from worker2interface[%d]\n",lcore_id);
+            	if(DEBUG==1)  printf("dequeue from _worker2interface[%d] completed \n",lcore_id);
 
                 rcv_item=((struct rte_ring_item*)dequeue_output[0]);
                 key=rcv_item->_key;
