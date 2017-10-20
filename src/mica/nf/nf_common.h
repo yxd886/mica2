@@ -12,6 +12,26 @@
 #include <vector>
 #include <iostream>
 
+struct rte_ring_item{
+    uint64_t _key_hash;
+    size_t _key_length;
+    char* _key;
+    struct session_state _state;
+
+
+    rte_ring_item(uint64_t key_hash,size_t key_length,char* key) :
+        _key_hash(key_hash),
+        _key_length(key_length),
+        _key(key),
+        _state()
+        {}
+    rte_ring_item(uint64_t key_hash,size_t key_length,char* key,struct session_state& dst) :
+        _key_hash(key_hash),
+        _key_length(key_length),
+        _key(key),
+        _state(dst)
+        {}
+};
 
 
 typedef ::mica::alloc::HugeTLBFS_SHM Alloc;
@@ -50,6 +70,7 @@ class ResponseHandler
    char* rcv_value=(char*)value;
    std::map<uint64_t,uint64_t>::iterator iter;
     if(result==::mica::table::Result::kSuccess){
+
 		hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
 		struct rte_ring_item it(0,0,0,*hash_rcv_state);
 		rte_ring_enqueue(_interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));
@@ -91,26 +112,6 @@ public:
 
 
 
-struct rte_ring_item{
-    uint64_t _key_hash;
-    size_t _key_length;
-    char* _key;
-    struct session_state _state;
-
-
-    rte_ring_item(uint64_t key_hash,size_t key_length,char* key) :
-        _key_hash(key_hash),
-        _key_length(key_length),
-        _key(key),
-        _state()
-        {}
-    rte_ring_item(uint64_t key_hash,size_t key_length,char* key,struct session_state& dst) :
-        _key_hash(key_hash),
-        _key_length(key_length),
-        _key(key),
-        _state(dst)
-        {}
-};
 
 
 
