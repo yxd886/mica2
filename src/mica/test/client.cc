@@ -1230,6 +1230,7 @@ main(int argc, char **argv)
                     client.set(key_hash, key, key_length, value, value_length, true);
 
                 }
+                printf("unrecognized action\n");
 
             }else{
             	//printf("nothing in worker2interface[%d]\n",lcore_id);
