@@ -574,7 +574,7 @@ void DatagramClient<StaticConfig>::handle_response(ResponseHandler& rh) {
           memcpy(tmp,r.get_key(),r.get_key_length());
           printf("key_hash:%d, key:%s\n",r.get_key_hash(),tmp);
           auto result = r.get_result();
-          rh.handle(rd, result, r.get_value(), r.get_value_length(),
+          rh.handle(rd, result, r.get_value(), r.get_value_length(),r.get_key_hash(),
                     thread_state.rd_items[rd].arg);
 
           release_rd(thread_state, rd);
@@ -615,7 +615,7 @@ void DatagramClient<StaticConfig>::handle_response(ResponseHandler& rh) {
     auto rd = thread_state.rd_active_first;
 
     // Call the handler.
-    rh.handle(rd, Result::kTimedOut, nullptr, 0, thread_state.rd_items[rd].arg);
+    rh.handle(rd, Result::kTimedOut, nullptr, 0,0,thread_state.rd_items[rd].arg);
 
     release_rd(thread_state, rd);
 
