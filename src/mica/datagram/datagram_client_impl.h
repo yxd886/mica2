@@ -572,9 +572,9 @@ void DatagramClient<StaticConfig>::handle_response(ResponseHandler& rh) {
           // Call the handler.
           char tmp[1000]={0};
           memcpy(tmp,r.get_key(),r.get_key_length());
-          printf("key_hash:%d, key:%s\n",r.get_key_hash(),tmp);
+         // printf("key_hash:%d, key:%s\n",r.get_key_hash(),tmp);
           auto result = r.get_result();
-          printf("entering rh.handle\n");
+         // printf("entering rh.handle\n");
           rh.handle(rd, result, r.get_value(), r.get_value_length(),r.get_key_hash(),
                     thread_state.rd_items[rd].arg);
 
