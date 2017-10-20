@@ -71,8 +71,10 @@ class ResponseHandler
    std::map<uint64_t,uint64_t>::iterator iter;
     if(result==::mica::table::Result::kSuccess){
 
-		hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
+		printf("result==::mica::table::Result::kSuccess\n");
+    	hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
 		struct rte_ring_item it(0,0,0,*hash_rcv_state);
+		printf("enqueue to _interface2worker[%d]\n",hash_rcv_state->lcore_id);
 		rte_ring_enqueue(_interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));
 
 		iter=_lcore_map->find(key_hash);

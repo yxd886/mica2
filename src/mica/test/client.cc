@@ -1208,8 +1208,9 @@ main(int argc, char **argv)
                         sw.diff_in_cycles(now, last_handle_response_time) >=
                         response_check_interval) {
                     last_handle_response_time = now;
-                    printf("handle_response now\n");
+                    printf("master handle_response now\n");
                     client.handle_response(rh);
+                    printf("master handle_response finished\n");
                 }
 
 
