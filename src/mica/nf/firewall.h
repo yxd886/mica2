@@ -83,6 +83,7 @@ public:
 
 	    if (iphdr->next_proto_id!=IPPROTO_TCP){
 		    //drop
+	    	if(DEBUG==1) printf("not tcp pkt\n");
 	        _drop=true;
 	        return;
 	    }else{
