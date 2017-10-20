@@ -51,7 +51,7 @@ public:
 	void check_session(struct fivetuple* five,firewall_state* state){
 
 		std::vector<rule>::iterator it;
-		for(it==rules.begin();it!=rules.end();it++){
+		for(it=rules.begin();it!=rules.end();it++){
 		    if(five->_dst_addr==it->_dst_addr&&five->_dst_port==it->_dst_port&&five->_src_addr==it->_src_addr&&five->_src_port==it->_src_port){
 		        state->_pass=false;
 			}
