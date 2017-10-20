@@ -1218,7 +1218,10 @@ main(int argc, char **argv)
                 rcv_state=&(rcv_item->_state);
                 if(rcv_state->_action==READ){
                     //get
-                    client.get(key_hash, key, key_length);
+                    char tmp[1000]={0};
+                    memcpy(tmp,key,key_length);
+                	printf("key_hash:%d, key:%s\n",key_hash,tmp);
+                	client.get(key_hash, key, key_length);
 
                 }else if(rcv_state->_action==WRITE){
                   //set

@@ -570,6 +570,9 @@ void DatagramClient<StaticConfig>::handle_response(ResponseHandler& rh) {
           if (thread_state.rd_items[rd].epoch != epoch) continue;
 
           // Call the handler.
+          char tmp[1000]={0};
+          memcpy(tmp,r.get_key(),r.get_key_length());
+          printf("key_hash:%d, key:%s\n",r.get_key_hash(),tmp);
           auto result = r.get_result();
           rh.handle(rd, result, r.get_value(), r.get_value_length(),
                     thread_state.rd_items[rd].arg);
