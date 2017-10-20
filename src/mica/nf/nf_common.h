@@ -81,6 +81,8 @@ class ResponseHandler
 
 		iter=_lcore_map->find(key_hash);
 		_lcore_map->erase(iter);
+    }else if(result==::mica::table::Result::setSuccess){
+    	if(DEBUG==1) printf("WRITE SUCCESS\n");
     }else{
     	if(DEBUG==1) printf("NOT FIND THE KEY FROM SERVER\n");
 
