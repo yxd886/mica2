@@ -100,7 +100,7 @@ public:
 
             //generate rte_ring_item
 	        struct rte_ring_item item(key_hash,key_length,key);
-	        printf("preparing to rte_ring_enqueue \n");
+	        printf("preparing to _worker2interface[%d] \n",lcore_id);
 	        rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
 	        void* rev_item;
 	        rev_item=get_value(_interface2worker[lcore_id]);

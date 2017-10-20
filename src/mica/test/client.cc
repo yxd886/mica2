@@ -1193,7 +1193,7 @@ main(int argc, char **argv)
             if(flag==0){
               //receive msg from workers
 
-
+            	printf("received a msg from worker2interface[%d]\n",lcore_id);
             	uint64_t now = sw.now();
                 rcv_item=((struct rte_ring_item*)dequeue_output);
                 key=rcv_item->_key;
@@ -1230,7 +1230,7 @@ main(int argc, char **argv)
                     client.set(key_hash, key, key_length, value, value_length, true);
 
                 }
-                printf("unrecognized action\n");
+                printf("unrecognized action: %d\n",rcv_state->_action);
 
             }else{
             	//printf("nothing in worker2interface[%d]\n",lcore_id);
