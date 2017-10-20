@@ -72,7 +72,13 @@ class ResponseHandler
    std::map<uint64_t,uint64_t>::iterator iter;
     if(result==::mica::table::Result::kSuccess||result==::mica::table::Result::setSuccess){
 
-		if(DEBUG==1) printf("result==::mica::table::Result::kSuccess\n");
+		if(result==::mica::table::Result::kSuccess){
+			if(DEBUG==1) printf("result==::mica::table::Result::kSuccess\n");
+		}
+		if(result==::mica::table::Result::setSuccess){
+			if(DEBUG==1) printf("result==::mica::table::Result::setSuccess\n");
+		}
+
     	hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
     	if(DEBUG==1) printf("received value's lcore_id: %d\n",hash_rcv_state->lcore_id);
 		struct rte_ring_item it(0,0,0,*hash_rcv_state);
@@ -83,9 +89,6 @@ class ResponseHandler
 		iter=_lcore_map->find(key_hash);
 		_lcore_map->erase(iter);
 
-		if(result==::mica::table::Result::setSuccess){
-			if(DEBUG==1) printf("WRITE SUCCESS\n");
-		}
 
 
     }else if(result==::mica::table::Result::kNotFound){
