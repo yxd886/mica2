@@ -1219,7 +1219,7 @@ main(int argc, char **argv)
                 	printf("READING FROM SERVER\n");
                     char tmp[1000]={0};
                     memcpy(tmp,key,key_length);
-                	printf("key_hash:%d, key:%s\n",key_hash,tmp);
+                	printf("key_hash:%d, key_length:%d, key:%s\n",key_hash,key_length,tmp);
                 	client.get(key_hash, key, key_length);
 
                 }else if(rcv_state->_action==WRITE){
@@ -1229,8 +1229,10 @@ main(int argc, char **argv)
                     value= reinterpret_cast<char*>(rcv_state);
                     client.set(key_hash, key, key_length, value, value_length, true);
 
+                }else{
+                	printf("unrecognized action: %d\n",rcv_state->_action);
                 }
-                printf("unrecognized action: %d\n",rcv_state->_action);
+
 
             }else{
             	//printf("nothing in worker2interface[%d]\n",lcore_id);
