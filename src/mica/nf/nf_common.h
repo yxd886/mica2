@@ -74,20 +74,29 @@ class ResponseHandler
 
 		if(result==::mica::table::Result::kSuccess){
 			if(DEBUG==1) printf("result==::mica::table::Result::kSuccess\n");
+	    	hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
+	    	if(DEBUG==1) printf("received value's lcore_id: %d\n",hash_rcv_state->lcore_id);
+			struct rte_ring_item it(0,0,0,*hash_rcv_state);
+			if(DEBUG==1) printf("try to enqueue to _interface2worker[%d]\n",hash_rcv_state->lcore_id);
+			rte_ring_enqueue(_interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));
+			if(DEBUG==1) printf("enqueue to _interface2worker[%d] completed\n",hash_rcv_state->lcore_id);
 		}
 		if(result==::mica::table::Result::setSuccess){
 			if(DEBUG==1) printf("result==::mica::table::Result::setSuccess\n");
+	    	hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
+	    	if(DEBUG==1) printf("received value's lcore_id: %d\n",hash_rcv_state->lcore_id);
+			struct rte_ring_item it(0,0,0,*hash_rcv_state);
+			if(DEBUG==1) printf("try to enqueue to _interface2worker[%d]\n",(*_lcore_map)[key_hash]);
+			rte_ring_enqueue(_interface2worker[(*_lcore_map)[key_hash]],static_cast<void*>(&it));
+			if(DEBUG==1) printf("enqueue to _interface2worker[%d] completed\n",(*_lcore_map)[key_hash]);
+			iter=_lcore_map->find(key_hash);
+			_lcore_map->erase(iter);
+
 		}
 
-    	hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
-    	if(DEBUG==1) printf("received value's lcore_id: %d\n",hash_rcv_state->lcore_id);
-		struct rte_ring_item it(0,0,0,*hash_rcv_state);
-		if(DEBUG==1) printf("try to enqueue to _interface2worker[%d]\n",hash_rcv_state->lcore_id);
-		rte_ring_enqueue(_interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));
-		if(DEBUG==1) printf("enqueue to _interface2worker[%d] completed\n",hash_rcv_state->lcore_id);
 
-		iter=_lcore_map->find(key_hash);
-		_lcore_map->erase(iter);
+
+
 
 
 
