@@ -69,7 +69,7 @@ public:
 	void process_packet(struct rte_mbuf* rte_pkt){
 
 
-		if(DEBUG==1) printf("processing firewall\n");
+		if(DEBUG==1) printf("processing firewall on core:%d\n",rte_lcore_id());
 
 	    struct ipv4_hdr *iphdr;
 	    struct tcp_hdr *tcp;
