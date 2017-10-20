@@ -1122,7 +1122,7 @@ main(int argc, char **argv)
     }
   //  rte_eal_mp_remote_launch(main_loop, NULL, CALL_MASTER);
 
-
+    printf("master core ready to run mica client\n");
 
     //start mica client
     auto config = ::mica::util::Config::load_file("client.json");
@@ -1208,6 +1208,7 @@ main(int argc, char **argv)
                         sw.diff_in_cycles(now, last_handle_response_time) >=
                         response_check_interval) {
                     last_handle_response_time = now;
+                    printf("handle_response now\n");
                     client.handle_response(rh);
                 }
 
@@ -1228,6 +1229,8 @@ main(int argc, char **argv)
 
                 }
 
+            }else{
+            	printf("nothing in worker2interface[%d]\n",lcore_id);
             }
 
         }
