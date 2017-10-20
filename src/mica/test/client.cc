@@ -337,10 +337,11 @@ send_single_packet(struct rte_mbuf *m, uint8_t port)
 
 
 static void
-l2fwd_simple_forward(struct rte_mbuf *m, unsigned portid)
+l2fwd_simple_forward(struct rte_mbuf *m, unsigned portid, void* function_ptr )
 {
-    printf("creating firewall\n");
-	Firewall a(worker2interface,interface2worker);
+    //printf("creating firewall\n");
+	//
+	Firewall* a=(Firewall*)function_ptr;
     struct ether_hdr *eth;
     void *tmp;
     unsigned dst_port;
@@ -359,8 +360,8 @@ l2fwd_simple_forward(struct rte_mbuf *m, unsigned portid)
     /* src addr */
    // ether_addr_copy(&l2fwd_ports_eth_addr[dst_port], &eth->s_addr);
 
-    a.process_packet(m);
-    if(a._drop){
+    a->process_packet(m);
+    if(a->_drop){
         rte_pktmbuf_free(m);
     }else{
         send_single_packet(m,portid);
@@ -389,6 +390,10 @@ main_loop(__attribute__((unused)) void *dummy)
     lcore_id = rte_lcore_id();
     qconf = &lcore_conf[lcore_id];
     socketid = rte_lcore_to_socket_id(lcore_id);
+
+
+    //load network function
+    Firewall a(worker2interface,interface2worker);
 
     if (qconf->n_rx_queue == 0) {
         RTE_LOG(INFO, L3FWD, "lcore %u has nothing to do\n", lcore_id);
@@ -439,7 +444,7 @@ main_loop(__attribute__((unused)) void *dummy)
                 for (int j = 0; j < nb_rx; j++) {
                     m = pkts_burst[j];
                     rte_prefetch0(rte_pktmbuf_mtod(m, void *));
-                    l2fwd_simple_forward(m, portid);
+                    l2fwd_simple_forward(m, portid,static_cast<void*>(&a));
 
 
                 }
