@@ -40,19 +40,32 @@ static uint64_t hash(const T* key, size_t key_length) {
 class ResponseHandler
     : public ::mica::datagram::ResponseHandlerInterface<Client> {
  public:
+	ResponseHandler(std::map<uint64_t,uint64_t> *lcore_map,struct rte_ring** worker2interface,struct rte_ring** interface2worker):_lcore_map(lcore_map),_worker2interface(worker2interface),_interface2worker(interface2worker){
+
+	}
   void handle(Client::RequestDescriptor rd, Result result, const char* value,
-              size_t value_length, const Argument& arg) {
-    (void)rd;
-    (void)result;
-    (void)value;
-    (void)value_length;
-    (void)arg;
-    _value=(char*)value;
-    _value_length=value_length;
+              size_t value_length,uint64_t key_hash, const Argument& arg) {
+
+   struct session_state*hash_rcv_state=nullptr;
+   char* rcv_value=(char*)value;
+   std::map<uint64_t,uint64_t>::iterator iter;
+    if(result==::mica::table::Result::kSuccess){
+		hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
+		struct rte_ring_item it(0,0,0,*hash_rcv_state);
+		rte_ring_enqueue(interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));
+
+		iter=_lcore_map->find(key_hash);
+		_lcore_map->erase(iter);
+    }else{
+
+    	rte_ring_enqueue(interface2worker[(*_lcore_map)[key_hash]],static_cast<void*>(nullptr));
+    }
+
 
   }
-  char* _value;
-  size_t _value_length;
+  struct rte_ring** _worker2interface;
+  struct rte_ring** _interface2worker;
+  std::map<uint64_t,uint64_t> *_lcore_map;
 
 
 };

@@ -30,12 +30,13 @@ class ResponseHandler
     : public ::mica::datagram::ResponseHandlerInterface<Client> {
  public:
   void handle(Client::RequestDescriptor rd, Result result, const char* value,
-              size_t value_length, const Argument& arg) {
+              size_t value_length, uint64_t key_hash,const Argument& arg) {
     (void)rd;
     (void)result;
     (void)value;
     (void)value_length;
     (void)arg;
+    (void) key_hash;
   }
 };
 

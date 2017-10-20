@@ -36,6 +36,7 @@
 #include "mica/util/zipf.h"
 #include "mica/network/dpdk.h"
 #include <vector>
+#include <map>
 #include <iostream>
 #include "mica/nf/firewall.h"
 #include "mica/nf/load_balancer.h"
@@ -1137,8 +1138,8 @@ main(int argc, char **argv)
     ::mica::util::lcore.pin_thread(master);
 
     client.probe_reachability();
-
-    ResponseHandler rh;
+    std::map<uint64_t,uint64_t> lcore_map;
+    ResponseHandler rh(&lcore_map,worker2interface,interface2worker);
 
     size_t num_items = 192 * 1048576;
 
@@ -1178,6 +1179,7 @@ main(int argc, char **argv)
     struct rte_ring_item* rcv_item;
     struct session_state* rcv_state;
     struct session_state* hash_rcv_state;
+
     while (true) {
         // Determine the operation type.
         uint32_t op_r = op_type_rand.next_u32();
@@ -1192,30 +1194,25 @@ main(int argc, char **argv)
             if(flag==0){
               //receive msg from workers
 
-                uint64_t now = sw.now();
-                while (!client.can_request(key_hash) ||
-                        sw.diff_in_cycles(now, last_handle_response_time) >=
-                        response_check_interval) {
-                    last_handle_response_time = now;
-                    client.handle_response(rh);
-                    rcv_value=rh._value;
-                    rcv_value_length=rh._value_length;
-                    if(rcv_value==nullptr){
-                    	rte_ring_enqueue(interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(nullptr));
-                    }else{
-						hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
-						struct rte_ring_item it(0,0,0,*hash_rcv_state);
-						rte_ring_enqueue(interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));
 
-                    }
-
-                }
-
+            	uint64_t now = sw.now();
                 rcv_item=((struct rte_ring_item*)dequeue_output);
                 key=rcv_item->_key;
                 key_length=rcv_item->_key_length;
                 key_hash=rcv_item->_key_hash;
                 rcv_state=&(rcv_item->_state);
+
+                lcore_map[key_hash]=lcore_id;
+
+
+                while (!client.can_request(key_hash) ||
+                        sw.diff_in_cycles(now, last_handle_response_time) >=
+                        response_check_interval) {
+                    last_handle_response_time = now;
+                    client.handle_response(rh);
+                }
+
+
                 if(rcv_state->_action==READ){
                     //get
                     char tmp[1000]={0};

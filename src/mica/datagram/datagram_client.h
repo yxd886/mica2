@@ -90,12 +90,13 @@ class ResponseHandlerInterface {
   typedef typename Client::Argument Argument;
 
   void handle(typename Client::RequestDescriptor rd, Result result,
-              const char* value, size_t value_length, const Argument& arg) {
+              const char* value, size_t value_length, uint64_t key_hash, const Argument& arg) {
     (void)rd;
     (void)result;
     (void)value;
     (void)value_length;
     (void)arg;
+    (void)key_hash;
   }
 };
 
