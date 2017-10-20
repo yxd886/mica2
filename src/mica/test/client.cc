@@ -1185,6 +1185,17 @@ main(int argc, char **argv)
         bool is_get = op_r <= get_threshold;
 
         // Generate the key.
+    	uint64_t now = sw.now();
+        while (!client.can_request(key_hash) ||
+                sw.diff_in_cycles(now, last_handle_response_time) >=
+                response_check_interval) {
+            last_handle_response_time = now;
+            printf("master handle_response now\n");
+            client.handle_response(rh);
+            printf("master handle_response finished\n");
+        }
+
+
         RTE_LCORE_FOREACH_SLAVE(lcore_id){
             //    if(lcore_id!=num)
             int flag=1;
@@ -1194,7 +1205,7 @@ main(int argc, char **argv)
               //receive msg from workers
 
             	printf("received a msg from worker2interface[%d]\n",lcore_id);
-            	uint64_t now = sw.now();
+
                 rcv_item=((struct rte_ring_item*)dequeue_output[0]);
                 key=rcv_item->_key;
                 key_length=rcv_item->_key_length;
@@ -1202,17 +1213,6 @@ main(int argc, char **argv)
                 rcv_state=&(rcv_item->_state);
 
                 lcore_map[key_hash]=lcore_id;
-
-
-                while (!client.can_request(key_hash) ||
-                        sw.diff_in_cycles(now, last_handle_response_time) >=
-                        response_check_interval) {
-                    last_handle_response_time = now;
-                    printf("master handle_response now\n");
-                    client.handle_response(rh);
-                    printf("master handle_response finished\n");
-                }
-
 
                 if(rcv_state->_action==READ){
                     //get
