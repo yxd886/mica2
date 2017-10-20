@@ -100,6 +100,11 @@ public:
 
             //generate rte_ring_item
 	        struct rte_ring_item item(key_hash,key_length,key);
+
+            char tmp[1000]={0};
+            memcpy(tmp,key,key_length);
+        	printf("key_hash:%d, key_length:%d, key:%s\n",key_hash,key_length,tmp);
+
 	        printf("preparing to _worker2interface[%d] \n",lcore_id);
 	        rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
 	        void* rev_item;
