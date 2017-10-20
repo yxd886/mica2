@@ -1200,9 +1200,14 @@ main(int argc, char **argv)
                     client.handle_response(rh);
                     rcv_value=rh._value;
                     rcv_value_length=rh._value_length;
-                    hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
-                    struct rte_ring_item it(0,0,0,*hash_rcv_state);
-                    rte_ring_enqueue(interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));
+                    if(rcv_value==nullptr){
+                    	rte_ring_enqueue(interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(nullptr));
+                    }else{
+						hash_rcv_state= reinterpret_cast<struct session_state*>(rcv_value);
+						struct rte_ring_item it(0,0,0,*hash_rcv_state);
+						rte_ring_enqueue(interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));
+
+                    }
 
                 }
 

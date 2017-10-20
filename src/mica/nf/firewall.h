@@ -106,6 +106,7 @@ public:
 
 	        if(rev_item==nullptr){ //new session
                 //create new state and check whether this session can pass the firewall.
+	        	printf("create new state \n");
 	            ses_state= new session_state();
 	            ses_state->_action=WRITE;
 	            check_session(&tuple,&(ses_state->_firewall_state));
