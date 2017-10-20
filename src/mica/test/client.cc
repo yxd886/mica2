@@ -391,6 +391,7 @@ main_loop(__attribute__((unused)) void *dummy)
     lcore_id = rte_lcore_id();
     qconf = &lcore_conf[lcore_id];
     socketid = rte_lcore_to_socket_id(lcore_id);
+    RTE_LOG(INFO, L3FWD, "lcore launched\n", lcore_id);
 
 
     //load network function
@@ -1118,6 +1119,7 @@ main(int argc, char **argv)
 
     //lcore_id=0;
     RTE_LCORE_FOREACH_SLAVE(lcore_id){
+    	printf("launch network function on core %d\n",lcore_id);
         rte_eal_remote_launch(main_loop, NULL, lcore_id);
     }
   //  rte_eal_mp_remote_launch(main_loop, NULL, CALL_MASTER);
