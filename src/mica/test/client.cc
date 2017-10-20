@@ -1195,7 +1195,7 @@ main(int argc, char **argv)
 
             	printf("received a msg from worker2interface[%d]\n",lcore_id);
             	uint64_t now = sw.now();
-                rcv_item=((struct rte_ring_item*)dequeue_output);
+                rcv_item=((struct rte_ring_item*)dequeue_output[0]);
                 key=rcv_item->_key;
                 key_length=rcv_item->_key_length;
                 key_hash=rcv_item->_key_hash;
