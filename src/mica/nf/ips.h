@@ -39,9 +39,9 @@ void process_batch(const struct aho_dfa *dfa_arr,
 		struct aho_state *st_arr = dfa_arr[dfa_id].root;
 
 		int state = ips_state->_state;
-		if(state>=dfa_arr[dfa_id].num_used_states){
-			state=0;
-		}
+	//	if(state>=dfa_arr[dfa_id].num_used_states){
+	//		state=0;
+	//	}
 
 
 		for(j = 0; j < len; j++) {
