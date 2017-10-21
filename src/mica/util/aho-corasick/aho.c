@@ -32,7 +32,7 @@ void aho_init(struct aho_dfa *dfa, int id)
 		exit(-1);
 	}
 
-	dfa->root = shmat(sid, 0, 0);
+	dfa->root =(struct aho_state *) shmat(sid, 0, 0);
 	assert(dfa->root != NULL);
 
 	int i;
@@ -225,7 +225,7 @@ struct aho_pattern
 		assert(len >= 0 && len < AHO_MAX_PATTERN_LEN);
 		patterns[i].len = len;		
 
-		patterns[i].content = malloc(len);
+		patterns[i].content = (uint8_t*)malloc(len);
 		assert(patterns[i].content != NULL);
 
 		/* Get one byte at a time */
@@ -300,7 +300,7 @@ struct aho_pkt *aho_get_pkts(const char *pkt_file, int *num_pkts)
 		fscanf(pkt_fp, "%d", &len);
 		pkts[i].len = len;		
 
-		pkts[i].content = malloc(len);
+		pkts[i].content = (uint8_t*)malloc(len);
 		assert(pkts[i].content != NULL);
 
 		/* Get one byte at a time */
