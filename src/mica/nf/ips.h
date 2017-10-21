@@ -254,6 +254,8 @@ public:
 	  	        rev_item=get_value(_interface2worker[lcore_id]);
 	  	        if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
 	  	        if(rev_item==nullptr){
+
+	    		    init_automataState(&state);
 		            item._state._action=WRITE;
 		            item._state._ips_state.copy(&state);
 		            if(DEBUG==1)  printf("try to enqueue to _worker2interface[%d] \n",lcore_id);
