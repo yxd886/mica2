@@ -343,6 +343,7 @@ l2fwd_simple_forward(struct rte_mbuf *m, unsigned portid, void* function_ptr )
     //printf("creating firewall\n");
 	//
 	Firewall* a=(Firewall*)function_ptr;
+
     struct ether_hdr *eth;
     void *tmp;
     unsigned dst_port;
@@ -396,6 +397,7 @@ main_loop(__attribute__((unused)) void *dummy)
 
     //load network function
     Firewall a(worker2interface,interface2worker);
+    IPS b(worker2interface,interface2worker);
 
     if (qconf->n_rx_queue == 0) {
         RTE_LOG(INFO, L3FWD, "lcore %u has nothing to do\n", lcore_id);
