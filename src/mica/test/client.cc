@@ -343,7 +343,8 @@ l2fwd_simple_forward(struct rte_mbuf *m, unsigned portid, void* function_ptr )
 {
     //printf("creating firewall\n");
 	//
-	Firewall* a=(Firewall*)function_ptr;
+	//Firewall* a=(Firewall*)function_ptr;
+	IPS* a=(IPS*)function_ptr;
 
     struct ether_hdr *eth;
     void *tmp;
