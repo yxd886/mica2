@@ -22,17 +22,7 @@ void aho_init(struct aho_dfa *dfa, int id)
 
 	dfa->id = id;
 	dfa->num_used_states = 0;
-
-	int sid = shmget(AHO_SHM_KEY + id, 
-		AHO_MAX_STATES * sizeof(struct aho_state),
-		IPC_CREAT | 0666 | SHM_HUGETLB);
-
-	if(sid < 0) {
-		printf("\tCould not allocate states for DFA %d\n", id);
-		exit(-1);
-	}
-
-	dfa->root =(struct aho_state *) shmat(sid, 0, 0);
+	dfa->root =(struct aho_state *) malloc(AHO_MAX_STATES * sizeof(struct aho_state));
 	assert(dfa->root != NULL);
 
 	int i;
