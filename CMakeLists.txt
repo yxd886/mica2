@@ -31,6 +31,7 @@ ADD_DEFINITIONS(-Wzero-as-null-pointer-constant)
 ADD_DEFINITIONS(-Wsign-conversion)
 ADD_DEFINITIONS(-Wconversion)
 ADD_DEFINITIONS(-Winline)
+ADD_DEFINITIONS(-fgnu89-inline)
 
 ADD_DEFINITIONS(-Wno-unused-function)
 
@@ -128,7 +129,13 @@ SET(SOURCES ${SOURCES} src/mica/util/lcore.cc)
 SET(SOURCES ${SOURCES} src/mica/util/stopwatch.cc)
 SET(SOURCES ${SOURCES} src/mica/util/zipf.cc)
 
-SET(LIBRARIES ${LIBRARIES} rt numa pthread)
+SET(SOURCES ${SOURCES} src/mica/util/aho-corasick/aho.c)
+SET(SOURCES ${SOURCES} src/mica/util/aho-corasick/ds_queue.c)
+SET(SOURCES ${SOURCES} src/mica/util/aho-corasick/util.c)
+
+
+
+SET(LIBRARIES ${LIBRARIES} rt numa pthread papi)
 SET(LIBRARIES ${LIBRARIES} curl)
 # SET(LIBRARIES ${LIBRARIES} boost_coroutine boost_system)
 
