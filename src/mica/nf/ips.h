@@ -172,8 +172,8 @@ public:
     }
     void ips_detect(struct rte_mbuf* rte_pkt, struct ips_state* state){
 
-    	struct aho_pkt pkts;
-    	parse_pkt(rte_pkt, state,&pkts);
+    	struct aho_pkt* pkts=(struct aho_pkt* )malloc(sizeof(struct aho_pkt));
+    	parse_pkt(rte_pkt, state,pkts);
        	struct aho_ctrl_blk worker_cb;
 
 
