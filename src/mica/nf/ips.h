@@ -14,6 +14,7 @@
 #include "../util/aho-corasick/util.h"
 #include "../util/aho-corasick/fpp.h"
 #include <stdlib.h>
+#include <time.h>
 
 
 #define MAX_MATCH 8192
@@ -165,7 +166,10 @@ public:
 
 
     void init_automataState(struct ips_state* state){
+    	srand((unsigned)time(NULL));
     	state->_state=0;
+    	state->_alert=false;
+    	state->_dfa_id=rand()%AHO_MAX_DFA;
     }
     void ips_detect(struct rte_mbuf* rte_pkt, struct ips_state* state){
 
@@ -190,7 +194,7 @@ public:
 	void process_packet(struct rte_mbuf* rte_pkt){
 
 
-		if(DEBUG==1) printf("processing firewall on core:%d\n",rte_lcore_id());
+		if(DEBUG==1) printf("processing ips on core:%d\n",rte_lcore_id());
 
 	    struct ipv4_hdr *iphdr;
 	    struct tcp_hdr *tcp;
