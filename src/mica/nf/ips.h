@@ -268,6 +268,7 @@ public:
 	  	        state._state=((struct rte_ring_item*)rev_item)->_state._ips_state._state;
 	  	        state._alert=((struct rte_ring_item*)rev_item)->_state._ips_state._alert;
 	  	        state._dfa_id=((struct rte_ring_item*)rev_item)->_state._ips_state._dfa_id;
+	  	      if(DEBUG==1)  printf("state: %d, dfa_id:%d\n",state._state, state._dfa_id);
 	  	        if(state._alert){
 	  	        	_drop=true;
 	  	        	return;
