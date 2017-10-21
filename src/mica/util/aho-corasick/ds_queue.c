@@ -17,7 +17,7 @@ void ds_queue_add(struct ds_queue *q, int data)
 	ds_queue_printf("ds_queue: Adding data %d to ds_queue %p\n", data, q);
 
 	/* Create a new null-terminated node */
-	struct ds_qnode *new_node = malloc(sizeof(struct ds_qnode));
+	struct ds_qnode *new_node =(struct ds_qnode *) malloc(sizeof(struct ds_qnode));
 	assert(new_node != NULL);
 
 	new_node->data = data;
