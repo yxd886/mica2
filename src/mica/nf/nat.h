@@ -123,6 +123,9 @@ public:
                     item2._state._nat_state._dst_ip_addr=select_ip;
                     item2._state._nat_state._dst_port=select_port;
                     rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item2));
+    		        if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
+    		        rev_item=get_value(_interface2worker[lcore_id]);
+    		        if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
 
                     //Write hash table(reverse_tuple, (p.ip,p.port))
                     struct fivetuple reverse_tuple(select_ip,iphdr->src_addr,select_port,tcp->src_port,iphdr->next_proto_id);
@@ -134,6 +137,10 @@ public:
                     item3._state._nat_state._dst_ip_addr=iphdr->src_addr;
                     item3._state._nat_state._dst_port=tcp->src_port;
                     rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item2));
+
+    		        if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
+    		        rev_item=get_value(_interface2worker[lcore_id]);
+    		        if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
 
                     update_packet_header(select_ip,select_port,rte_pkt);
                 }

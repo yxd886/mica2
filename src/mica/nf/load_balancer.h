@@ -101,6 +101,10 @@ public:
                     item1._state._load_balancer_state._dst_ip_addr=server;
                     rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item1));
 
+    		        if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
+    		        rev_item=get_value(_interface2worker[lcore_id]);
+    		        if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
+
 
                     //To do:send packet to server
                     iphdr->dst_addr=server;
