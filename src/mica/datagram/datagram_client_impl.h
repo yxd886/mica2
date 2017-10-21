@@ -581,6 +581,7 @@ void DatagramClient<StaticConfig>::handle_response(ResponseHandler& rh) {
           release_rd(thread_state, rd);
 
           worker_stats_[lcore_id].num_operations_done++;
+          printf("result type: %d\n",result);
           if (result == Result::kSuccess)
             worker_stats_[lcore_id].num_operations_succeeded++;
           else if (result == Result::kRejected)
