@@ -69,6 +69,36 @@ struct nat_state{
 
 };
 
+struct ips_state{
+    uint32_t _state;
+    uint32_t _dfa_id;
+    bool _alert;
+
+
+    ips_state():_state(0),_dfa_id(0),_alert(false){
+
+    }
+    ips_state(uint32_t state):_state(state),_dfa_id(0),_alert(false){
+
+    }
+    ips_state(uint32_t state,uint32_t dfa_id):_state(state),_dfa_id(dfa_id),_alert(false){
+
+    }
+    ips_state(uint32_t state,uint32_t dfa_id,bool alert):_state(state),_dfa_id(dfa_id),_alert(alert){
+
+    }
+
+    void copy(struct ips_state* c){
+        _state=c->_state;
+        _alert=c->_alert;
+        _dfa_id=c->_dfa_id;
+
+
+    }
+
+
+};
+
 
 
 struct session_state{
@@ -79,7 +109,8 @@ struct session_state{
     struct firewall_state _firewall_state;
     struct load_balancer_state _load_balancer_state;
     struct nat_state _nat_state;
-    session_state():_action(READ),_firewall_state(),_load_balancer_state(),_nat_state(){
+    struct ips_state _ips_state;
+    session_state():_action(READ),_firewall_state(),_load_balancer_state(),_nat_state(),_ips_state(){
         lcore_id=rte_lcore_id();
     }
     session_state( struct session_state& dst){
@@ -88,6 +119,7 @@ struct session_state{
         _firewall_state.copy(&(dst._firewall_state));
         _load_balancer_state.copy(&(dst._load_balancer_state));
         _nat_state.copy(&(dst._nat_state));
+        _ips_state.copy(&(dst._ips_state));
     }
 
 };
