@@ -70,9 +70,9 @@ void process_batch(const struct aho_dfa *dfa_arr,
 
 bool state_updated(struct ips_state* old_,struct ips_state* new_){
 	if(old_->_alert==new_->_alert&&old_->_dfa_id==new_->_dfa_id&&old_->_state==new_->_state){
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }
 
 void ids_func(struct aho_ctrl_blk *cb,struct ips_state* state)
