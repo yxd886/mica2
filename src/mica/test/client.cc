@@ -41,6 +41,7 @@
 #include "mica/nf/firewall.h"
 #include "mica/nf/load_balancer.h"
 #include "mica/nf/nat.h"
+#include "mica/nf/ips.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
