@@ -268,7 +268,7 @@ public:
 	  	        state._state=((struct rte_ring_item*)rev_item)->_state._ips_state._state;
 	  	        state._alert=((struct rte_ring_item*)rev_item)->_state._ips_state._alert;
 	  	        state._dfa_id=((struct rte_ring_item*)rev_item)->_state._ips_state._dfa_id;
-	  	      if(DEBUG==1)  printf("state: %d, dfa_id:%d\n",state._state, state._dfa_id);
+	  	      if(DEBUG==1)  printf("RECEIVE: state: %d, dfa_id:%d\n",state._state, state._dfa_id);
 	  	        if(state._alert){
 	  	        	_drop=true;
 	  	        	return;
@@ -277,6 +277,7 @@ public:
 
 	            item._state._action=WRITE;
 	            item._state._ips_state.copy(&state);
+	    	    if(DEBUG==1)  printf("WRITE: state: %d, dfa_id:%d\n",state._state, state._dfa_id);
 	            if(DEBUG==1)  printf("try to enqueue to _worker2interface[%d] \n",lcore_id);
 	            rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
 	            if(DEBUG==1)  printf("enqueue to _worker2interface[%d] completed\n",lcore_id);
