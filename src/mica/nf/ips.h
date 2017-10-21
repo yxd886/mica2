@@ -114,7 +114,51 @@ struct aho_pkt * parse_pkt(struct rte_mbuf* rte_pkt, struct ips_state* state){
 class IPS{
 public:
     IPS(struct rte_ring** worker2interface,struct rte_ring** interface2worker):
-		_worker2interface(worker2interface),_interface2worker(interface2worker),_drop(false){}
+		_worker2interface(worker2interface),_interface2worker(interface2worker),_drop(false){
+
+
+
+    		int num_patterns, num_pkts, i;
+
+        	int num_threads = 1;
+        	assert(num_threads >= 1 && num_threads <= AHO_MAX_THREADS);
+
+        	stats =(struct stat_t*)malloc(num_threads * sizeof(struct stat_t));
+        	for(i = 0; i < num_threads; i++) {
+        		stats[i].tput = 0;
+        	}
+
+        	struct aho_pattern *patterns;
+
+
+
+        	/* Thread structures */
+        	//pthread_t worker_threads[AHO_MAX_THREADS];
+
+
+        	red_printf("State size = %lu\n", sizeof(struct aho_state));
+
+        	/* Initialize the shared DFAs */
+        	for(i = 0; i < AHO_MAX_DFA; i++) {
+        		printf("Initializing DFA %d\n", i);
+        		aho_init(&dfa_arr[i], i);
+        	}
+
+        	red_printf("Adding patterns to DFAs\n");
+        	patterns = aho_get_patterns(AHO_PATTERN_FILE,
+        		&num_patterns);
+
+        	for(i = 0; i < num_patterns; i++) {
+        		int dfa_id = patterns[i].dfa_id;
+        		aho_add_pattern(&dfa_arr[dfa_id], &patterns[i], i);
+        	}
+
+        	red_printf("Building AC failure function\n");
+        	for(i = 0; i < AHO_MAX_DFA; i++) {
+        		aho_build_ff(&dfa_arr[i]);
+        		aho_preprocess_dfa(&dfa_arr[i]);
+        	}
+    }
 
 
 
@@ -125,64 +169,22 @@ public:
     }
     void ips_detect(struct rte_mbuf* rte_pkt, struct ips_state* state){
 
-
-    	int num_patterns, num_pkts, i;
-
-    	int num_threads = 1;
-    	assert(num_threads >= 1 && num_threads <= AHO_MAX_THREADS);
-
-    	struct stat_t *stats =(struct stat_t*)malloc(num_threads * sizeof(struct stat_t));
-    	for(i = 0; i < num_threads; i++) {
-    		stats[i].tput = 0;
-    	}
-
-    	struct aho_pattern *patterns;
     	struct aho_pkt *pkts;
-    	struct aho_dfa dfa_arr[AHO_MAX_DFA];
-
-    	/* Thread structures */
-    	//pthread_t worker_threads[AHO_MAX_THREADS];
-    	struct aho_ctrl_blk worker_cb[AHO_MAX_THREADS];
-
-    	red_printf("State size = %lu\n", sizeof(struct aho_state));
-
-    	/* Initialize the shared DFAs */
-    	for(i = 0; i < AHO_MAX_DFA; i++) {
-    		printf("Initializing DFA %d\n", i);
-    		aho_init(&dfa_arr[i], i);
-    	}
-
-    	red_printf("Adding patterns to DFAs\n");
-    	patterns = aho_get_patterns(AHO_PATTERN_FILE,
-    		&num_patterns);
-
-    	for(i = 0; i < num_patterns; i++) {
-    		int dfa_id = patterns[i].dfa_id;
-    		aho_add_pattern(&dfa_arr[dfa_id], &patterns[i], i);
-    	}
-
-    	red_printf("Building AC failure function\n");
-    	for(i = 0; i < AHO_MAX_DFA; i++) {
-    		aho_build_ff(&dfa_arr[i]);
-    		aho_preprocess_dfa(&dfa_arr[i]);
-    	}
-
-    	red_printf("Reading packets from file\n");
-
-
     	pkts = parse_pkt(rte_pkt, state);
+       	struct aho_ctrl_blk worker_cb;
 
-    	for(i = 0; i < num_threads; i++) {
-    		worker_cb[i].stats = stats;
-    		worker_cb[i].tot_threads = num_threads;
-    		worker_cb[i].tid = i;
-    		worker_cb[i].dfa_arr = dfa_arr;
-    		worker_cb[i].pkts = pkts;
-    		worker_cb[i].num_pkts = 1;
 
-    		ids_func(&worker_cb[i],state);
 
-    	}
+		worker_cb.stats = stats;
+		worker_cb.tot_threads = 1;
+		worker_cb.tid = 0;
+		worker_cb.dfa_arr = dfa_arr;
+		worker_cb.pkts = pkts;
+		worker_cb.num_pkts = 1;
+
+		ids_func(&worker_cb,state);
+
+
     }
 
 	void process_packet(struct rte_mbuf* rte_pkt){
@@ -282,6 +284,8 @@ public:
 	struct rte_ring** _worker2interface;
 	struct rte_ring** _interface2worker;
 	bool _drop;
+	struct aho_dfa dfa_arr[AHO_MAX_DFA];
+	struct stat_t *stats;
 
 };
 
