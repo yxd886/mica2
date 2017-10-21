@@ -19,6 +19,8 @@
 
 #define MAX_MATCH 8192
 
+
+
 /* A list of patterns matched by a packet */
 struct mp_list_t {
 	int num_match;
@@ -64,6 +66,13 @@ void process_batch(const struct aho_dfa *dfa_arr,
 	}
 
 
+}
+
+bool state_updated(struct ips_state* old_,struct ips_state* new_){
+	if(old_->_alert==new_->_alert&&old_->_dfa_id==new_->_dfa_id&&old_->_state==new_->_state){
+		return true;
+	}
+	return false;
 }
 
 void ids_func(struct aho_ctrl_blk *cb,struct ips_state* state)
@@ -279,18 +288,23 @@ public:
 	  	        	_drop=true;
 	  	        	return;
 	  	        }
-				ips_detect(rte_pkt,&state);
+				struct ips_state old(0);
+				old.copy(&state);
+	  	        ips_detect(rte_pkt,&state);
+	  	        if(state_updated(&old,&state)){
+		            item._state._action=WRITE;
+		            item._state._ips_state.copy(&state);
+		    	    if(DEBUG==1)  printf("WRITE: state: %d, dfa_id:%d\n",state._state, state._dfa_id);
+		            if(DEBUG==1)  printf("try to enqueue to _worker2interface[%d] \n",lcore_id);
+		            rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
+		            if(DEBUG==1)  printf("enqueue to _worker2interface[%d] completed\n",lcore_id);
 
-	            item._state._action=WRITE;
-	            item._state._ips_state.copy(&state);
-	    	    if(DEBUG==1)  printf("WRITE: state: %d, dfa_id:%d\n",state._state, state._dfa_id);
-	            if(DEBUG==1)  printf("try to enqueue to _worker2interface[%d] \n",lcore_id);
-	            rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
-	            if(DEBUG==1)  printf("enqueue to _worker2interface[%d] completed\n",lcore_id);
+			        if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
+			        rev_item=get_value(_interface2worker[lcore_id]);
+			        if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
+	  	        }
 
-		        if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
-		        rev_item=get_value(_interface2worker[lcore_id]);
-		        if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
+
 	  	        if(state._alert){
 	  	        	_drop=true;
 	  	        	return;
