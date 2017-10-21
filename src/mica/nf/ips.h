@@ -131,7 +131,7 @@ public:
     	int num_threads = 1;
     	assert(num_threads >= 1 && num_threads <= AHO_MAX_THREADS);
 
-    	struct stat_t *stats = memalign(64, num_threads * sizeof(struct stat_t));
+    	struct stat_t *stats =(struct stat_t)malloc(num_threads * sizeof(struct stat_t));
     	for(i = 0; i < num_threads; i++) {
     		stats[i].tput = 0;
     	}
