@@ -13,6 +13,7 @@
 #include "../util/aho-corasick/aho.h"
 #include "../util/aho-corasick/util.h"
 #include "../util/aho-corasick/fpp.h"
+#include <stdlib.h>
 
 
 #define MAX_MATCH 8192
@@ -102,8 +103,8 @@ void ids_func(struct aho_ctrl_blk *cb,struct ips_state* state)
 
 struct aho_pkt * parse_pkt(struct rte_mbuf* rte_pkt, struct ips_state* state){
 	struct aho_pkt  aho_pkt;
-	aho_pkt.content=malloc(rte_pkt->buf_len);
-	memcpy(aho_pkt.content,rte_pkt->buf_addr);
+	aho_pkt.content=(uint8_t*)malloc(rte_pkt->buf_len);
+	memcpy(aho_pkt.content,rte_pkt->buf_addr,rte_pkt->buf_len);
 	aho_pkt.dfa_id=state->_dfa_id;
 	aho_pkt.len=rte_pkt->buf_len;
 	return &aho_pkt;
@@ -182,15 +183,6 @@ public:
     		ids_func(&worker_cb[i],state);
 
     	}
-
-
-
-    	return 0;
-
-
-
-
-
     }
 
 	void process_packet(struct rte_mbuf* rte_pkt){
