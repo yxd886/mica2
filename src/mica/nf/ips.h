@@ -102,13 +102,12 @@ void ids_func(struct aho_ctrl_blk *cb,struct ips_state* state)
 
 }
 
-struct aho_pkt * parse_pkt(struct rte_mbuf* rte_pkt, struct ips_state* state){
-	struct aho_pkt  aho_pkt;
-	aho_pkt.content=(uint8_t*)malloc(rte_pkt->buf_len);
-	memcpy(aho_pkt.content,rte_pkt->buf_addr,rte_pkt->buf_len);
-	aho_pkt.dfa_id=state->_dfa_id;
-	aho_pkt.len=rte_pkt->buf_len;
-	return &aho_pkt;
+void parse_pkt(struct rte_mbuf* rte_pkt, struct ips_state* state,struct aho_pkt*  aho_pkt){
+
+	aho_pkt->content=(uint8_t*)malloc(rte_pkt->buf_len);
+	memcpy(aho_pkt->content,rte_pkt->buf_addr,rte_pkt->buf_len);
+	aho_pkt->dfa_id=state->_dfa_id;
+	aho_pkt->len=rte_pkt->buf_len;
 }
 
 
@@ -173,8 +172,8 @@ public:
     }
     void ips_detect(struct rte_mbuf* rte_pkt, struct ips_state* state){
 
-    	struct aho_pkt *pkts;
-    	pkts = parse_pkt(rte_pkt, state);
+    	struct aho_pkt pkts;
+    	parse_pkt(rte_pkt, state,&pkts);
        	struct aho_ctrl_blk worker_cb;
 
 
