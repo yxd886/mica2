@@ -83,7 +83,7 @@ void *shm_map(int key, int bytes)
 	return data;
 }
 
-inline uint32_t fastrand(uint64_t* seed)
+uint32_t fastrand(uint64_t* seed)
 {
     *seed = *seed * 1103515245 + 12345;
     return (uint32_t)(*seed >> 32);
@@ -120,7 +120,7 @@ int *get_active_bits(int mask)
 	return active_bits;
 }
 
-inline void set_mac(uint8_t *mac_ptr, ULL mac_addr)
+void set_mac(uint8_t *mac_ptr, ULL mac_addr)
 {
    	mac_ptr[0] = mac_addr & 0xFF;
     mac_ptr[1] = (mac_addr >> 8) & 0xFF;
@@ -130,7 +130,7 @@ inline void set_mac(uint8_t *mac_ptr, ULL mac_addr)
     mac_ptr[5] = (mac_addr >> 40) & 0xFF;
 }
 
-inline ULL get_mac(uint8_t *mac_ptr)
+ULL get_mac(uint8_t *mac_ptr)
 {
 	ULL ret = 0;
 	ret = mac_ptr[0] + 
@@ -143,7 +143,7 @@ inline ULL get_mac(uint8_t *mac_ptr)
 	return ret;
 }
 
-inline void swap_mac(uint8_t *src_mac_ptr, uint8_t *dst_mac_ptr)
+void swap_mac(uint8_t *src_mac_ptr, uint8_t *dst_mac_ptr)
 {
 	int i = 0;
 	for(i = 0; i < 6; i++) {
