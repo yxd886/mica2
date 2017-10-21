@@ -129,13 +129,13 @@ SET(SOURCES ${SOURCES} src/mica/util/lcore.cc)
 SET(SOURCES ${SOURCES} src/mica/util/stopwatch.cc)
 SET(SOURCES ${SOURCES} src/mica/util/zipf.cc)
 
-SET(SOURCES ${SOURCES} src/mica/util/aho-corasick/aho.c)
-SET_SOURCE_FILES_PROPERTIES(src/mica/util/aho-corasick/aho.c PROPERTIES LANGUAGE CXX)
+
 SET(SOURCES ${SOURCES} src/mica/util/aho-corasick/ds_queue.c)
 SET_SOURCE_FILES_PROPERTIES(src/mica/util/aho-corasick/ds_queue.c PROPERTIES LANGUAGE CXX)
 SET(SOURCES ${SOURCES} src/mica/util/aho-corasick/util.c)
 SET_SOURCE_FILES_PROPERTIES(src/mica/util/aho-corasick/util.c PROPERTIES LANGUAGE CXX)
-
+SET(SOURCES ${SOURCES} src/mica/util/aho-corasick/aho.c)
+SET_SOURCE_FILES_PROPERTIES(src/mica/util/aho-corasick/aho.c PROPERTIES LANGUAGE CXX)
 
 
 SET(LIBRARIES ${LIBRARIES} rt numa pthread papi)
