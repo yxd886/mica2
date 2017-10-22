@@ -285,6 +285,7 @@ public:
 	  	        state._dfa_id=((struct rte_ring_item*)rev_item)->_state._ips_state._dfa_id;
 	  	      if(DEBUG==1)  printf("RECEIVE: state: %d, dfa_id:%d\n",state._state, state._dfa_id);
 	  	        if(state._alert){
+	  	        	printf("alert!!!\n");
 	  	        	_drop=true;
 	  	        	return;
 	  	        }
