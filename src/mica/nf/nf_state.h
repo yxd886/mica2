@@ -103,7 +103,7 @@ struct ips_state{
 
 struct session_state{
     uint8_t _action;
-    uint8_t lcore_id;
+    uint32_t lcore_id;
 
     //firewall state:
 
