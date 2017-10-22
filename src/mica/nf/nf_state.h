@@ -115,7 +115,7 @@ struct session_state{
     };
 
 
-    session_state():_action(READ),_firewall_state(),_load_balancer_state(),_nat_state(),_ips_state(){
+    session_state():_action(READ){
         lcore_id=rte_lcore_id();
     }
     session_state( struct session_state& dst){
