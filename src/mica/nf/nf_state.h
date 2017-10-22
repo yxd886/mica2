@@ -107,13 +107,12 @@ struct session_state{
 
     //firewall state:
 
-union{
+
     	struct firewall_state _firewall_state;
 
     	struct load_balancer_state _load_balancer_state;
     	struct ips_state _ips_state;
     	struct nat_state _nat_state;
-    };
 
 
 
