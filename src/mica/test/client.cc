@@ -1222,6 +1222,7 @@ main(int argc, char **argv)
                 key_length=rcv_item->_key_length;
                 key_hash=rcv_item->_key_hash;
                 rcv_state=&(rcv_item->_state);
+                if(DEBUG==1)	printf("size of session state:%d\n",sizeof(rcv_item->_state));
 
                 lcore_map[key_hash]=lcore_id;
 
