@@ -296,7 +296,7 @@ public:
 	  	        if(state_updated(&old,&state)){
 		            item._state._action=WRITE;
 		            item._state._ips_state.copy(&state);
-		    	    if(DEBUG==1)  printf("WRITE:alert: %d state: %d, dfa_id:%d\n",state._alert,state._state, state._dfa_id);
+		    	    if(DEBUG==1)  printf("WRITE:alert: %d state: %d, dfa_id:%d\n",item._state._ips_state._alert,item._state._ips_state._state, item._state._ips_state._dfa_id);
 		            if(DEBUG==1)  printf("try to enqueue to _worker2interface[%d] \n",lcore_id);
 		            rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
 		            if(DEBUG==1)  printf("enqueue to _worker2interface[%d] completed\n",lcore_id);
