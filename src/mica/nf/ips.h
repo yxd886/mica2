@@ -285,11 +285,6 @@ public:
 	  	        state._alert=((struct rte_ring_item*)rev_item)->_state._ips_state._alert;
 	  	        state._dfa_id=((struct rte_ring_item*)rev_item)->_state._ips_state._dfa_id;
 	  	      if(DEBUG==1)  printf("RECEIVE: alert: %d state: %d, dfa_id:%d\n",state._alert,state._state, state._dfa_id);
-	  	        if(state._alert){
-	  	        	printf("alert!!!\n");
-	  	        	_drop=true;
-	  	        	return;
-	  	        }
 				struct ips_state old(0);
 				old.copy(&state);
 	  	        ips_detect(rte_pkt,&state);
