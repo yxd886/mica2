@@ -93,7 +93,8 @@ public:
             rev_item=get_value(_interface2worker[lcore_id]);
             if(rev_item==nullptr){
             //ip,port is null
-                key= reinterpret_cast<char*>(&_cluster_id);
+                if(DEBUG) printf("can't find five tuples,\n");
+            	key= reinterpret_cast<char*>(&_cluster_id);
                 key_length= sizeof(_cluster_id);
                 key_hash= hash(key, key_length);
                 struct rte_ring_item item1(key_hash,key_length,key);
@@ -102,7 +103,7 @@ public:
                 rev_item=get_value(_interface2worker[lcore_id]);
                 if(rev_item==nullptr){
                     //_cluster doesn't includes any dst.
-
+                	if(DEBUG) printf("can't find cluster,\n");
 					item1._state._action=WRITE;
 					item1._state._nat_state._ip_port_list=0x111111;
 					rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item1));
