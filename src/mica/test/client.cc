@@ -345,7 +345,8 @@ l2fwd_simple_forward(struct rte_mbuf *m, unsigned portid, void* function_ptr )
 	//
 	//Firewall* a=(Firewall*)function_ptr;
 	//IPS* a=(IPS*)function_ptr;
-	NAT* a=(NAT*)function_ptr;
+	//NAT* a=(NAT*)function_ptr;
+	Load_balancer a=(Load_balancer*)function_ptr;
 
     struct ether_hdr *eth;
     void *tmp;
@@ -401,7 +402,8 @@ main_loop(__attribute__((unused)) void *dummy)
     //load network function
     //Firewall a(worker2interface,interface2worker);
     //IPS a(worker2interface,interface2worker);
-    NAT a(worker2interface,interface2worker,1);
+   // NAT a(worker2interface,interface2worker,1);
+    Load_balancer a(worker2interface,interface2worker,1);
 
     if (qconf->n_rx_queue == 0) {
         RTE_LOG(INFO, L3FWD, "lcore %u has nothing to do\n", lcore_id);
