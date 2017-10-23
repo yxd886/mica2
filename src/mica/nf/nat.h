@@ -102,8 +102,20 @@ public:
                 rev_item=get_value(_interface2worker[lcore_id]);
                 if(rev_item==nullptr){
                     //_cluster doesn't includes any dst.
-                    std::cout<<"_cluster doesn't includes any dst"<<std::endl;
-                    exit(-1);
+
+					item1._state._action=WRITE;
+					item1._state._nat_state._ip_port_list=0x111111;
+					rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item1));
+
+					if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
+					rev_item=get_value(_interface2worker[lcore_id]);
+					if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
+
+
+
+
+                	//std::cout<<"_cluster doesn't includes any dst"<<std::endl;
+                   // exit(-1);
                 }else{
 
                     //select proper ip and port
