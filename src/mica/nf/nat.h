@@ -100,12 +100,14 @@ public:
                 struct rte_ring_item item1(key_hash,key_length,key);
                 rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item1));
                 rev_item=nullptr;
+                uint64_t ip_port_list_bit=0x111111;
                 rev_item=get_value(_interface2worker[lcore_id]);
                 if(rev_item==nullptr){
                     //_cluster doesn't includes any dst.
                 	if(DEBUG) printf("can't find cluster,\n");
+                	if(DEBUG) printf("try to write the cluster,\n");
 					item1._state._action=WRITE;
-					item1._state._nat_state._ip_port_list=0x111111;
+					item1._state._nat_state._ip_port_list=ip_port_list_bit;
 					rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item1));
 
 					if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
@@ -121,42 +123,45 @@ public:
 
                     //select proper ip and port
                     ses_state=&(((struct rte_ring_item*)rev_item)->_state);
-                    uint64_t ip_port_list_bit=ses_state->_nat_state._ip_port_list;
-                    form_list(ip_port_list_bit);
-                    uint32_t select_ip=0;
-                    uint16_t select_port=0;
-                    select_ip_port(&select_ip,&select_port);
-
-                    //Write hash table(tuple, (ip,port))
-                    key= reinterpret_cast<char*>(&tuple);
-                    key_length= sizeof(tuple);
-                    key_hash= hash(key, key_length);
-                    struct rte_ring_item item2(key_hash,key_length,key);
-                    item2._state._action=WRITE;
-                    item2._state._nat_state._dst_ip_addr=select_ip;
-                    item2._state._nat_state._dst_port=select_port;
-                    rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item2));
-    		        if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
-    		        rev_item=get_value(_interface2worker[lcore_id]);
-    		        if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
-
-                    //Write hash table(reverse_tuple, (p.ip,p.port))
-                    struct fivetuple reverse_tuple(select_ip,iphdr->src_addr,select_port,tcp->src_port,iphdr->next_proto_id);
-                    key= reinterpret_cast<char*>(&reverse_tuple);
-                    key_length= sizeof(reverse_tuple);
-                    key_hash= hash(key, key_length);
-                    struct rte_ring_item item3(key_hash,key_length,key);
-                    item3._state._action=WRITE;
-                    item3._state._nat_state._dst_ip_addr=iphdr->src_addr;
-                    item3._state._nat_state._dst_port=tcp->src_port;
-                    rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item2));
-
-    		        if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
-    		        rev_item=get_value(_interface2worker[lcore_id]);
-    		        if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
-
-                    update_packet_header(select_ip,select_port,rte_pkt);
+                    ip_port_list_bit=ses_state->_nat_state._ip_port_list;
                 }
+
+
+				form_list(ip_port_list_bit);
+				uint32_t select_ip=0;
+				uint16_t select_port=0;
+				select_ip_port(&select_ip,&select_port);
+
+				//Write hash table(tuple, (ip,port))
+				key= reinterpret_cast<char*>(&tuple);
+				key_length= sizeof(tuple);
+				key_hash= hash(key, key_length);
+				struct rte_ring_item item2(key_hash,key_length,key);
+				item2._state._action=WRITE;
+				item2._state._nat_state._dst_ip_addr=select_ip;
+				item2._state._nat_state._dst_port=select_port;
+				rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item2));
+				if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
+				rev_item=get_value(_interface2worker[lcore_id]);
+				if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
+
+				//Write hash table(reverse_tuple, (p.ip,p.port))
+				struct fivetuple reverse_tuple(select_ip,iphdr->src_addr,select_port,tcp->src_port,iphdr->next_proto_id);
+				key= reinterpret_cast<char*>(&reverse_tuple);
+				key_length= sizeof(reverse_tuple);
+				key_hash= hash(key, key_length);
+				struct rte_ring_item item3(key_hash,key_length,key);
+				item3._state._action=WRITE;
+				item3._state._nat_state._dst_ip_addr=iphdr->src_addr;
+				item3._state._nat_state._dst_port=tcp->src_port;
+				rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item2));
+
+				if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
+				rev_item=get_value(_interface2worker[lcore_id]);
+				if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
+
+				update_packet_header(select_ip,select_port,rte_pkt);
+
 
             }else{
 
