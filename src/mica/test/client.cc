@@ -346,7 +346,7 @@ l2fwd_simple_forward(struct rte_mbuf *m, unsigned portid, void* function_ptr )
 	//Firewall* a=(Firewall*)function_ptr;
 	//IPS* a=(IPS*)function_ptr;
 	//NAT* a=(NAT*)function_ptr;
-	Load_balancer a=(Load_balancer*)function_ptr;
+	Load_balancer* a=(Load_balancer*)function_ptr;
 
     struct ether_hdr *eth;
     void *tmp;
