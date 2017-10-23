@@ -65,90 +65,80 @@ public:
             size_t key_length;
             uint64_t key_hash;
             struct fivetuple tuple(iphdr->src_addr,iphdr->dst_addr,tcp->src_port,tcp->dst_port,iphdr->next_proto_id);
-            if((tcp->tcp_flags&0x2)>>1==1){
-
-                key= reinterpret_cast<char*>(&_cluster_id);
-                key_length= sizeof(_cluster_id);
-                key_hash= hash(key, key_length);
-                uint64_t backend_list=0;
-                struct rte_ring_item item(key_hash,key_length,key);
-                rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
-                void* rev_item;
-                rev_item=get_value(_interface2worker[lcore_id]);
-                struct session_state* ses_state=nullptr;
-
-                if(rev_item==nullptr){
-                    //backend list is empty
-                    exit(-1);
-
-
-                }else{
-
-                    ses_state=&(((struct rte_ring_item*)rev_item)->_state);
-
-
-                    backend_list=ses_state->_load_balancer_state._backend_list;
-                    form_list(backend_list);
-
-                    server=next_server();
-
-                    //generate key and write hash table
-                    key= reinterpret_cast<char*>(&tuple);
-                    key_length= sizeof(tuple);
-                    key_hash= hash(key, key_length);
-                    struct rte_ring_item item1(key_hash,key_length,key);
-                    item1._state._action=WRITE;
-                    item1._state._load_balancer_state._dst_ip_addr=server;
-                    rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item1));
-
-    		        if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
-    		        rev_item=get_value(_interface2worker[lcore_id]);
-    		        if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
-
-
-                    //To do:send packet to server
-                    iphdr->dst_addr=server;
-                    _drop=false;
-                    return;
 
 
 
+			key= reinterpret_cast<char*>(&tuple);
+			key_length= sizeof(tuple);
+			key_hash= hash(key, key_length);
+			struct rte_ring_item item(key_hash,key_length,key);
+			item._state._action=READ;
+			rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
 
-                }
-            }else{
+			void* rev_item;
+			rev_item=get_value(_interface2worker[lcore_id]);
+			if(rev_item==nullptr){
 
-                key= reinterpret_cast<char*>(&tuple);
-                key_length= sizeof(tuple);
-                key_hash= hash(key, key_length);
-                struct rte_ring_item item(key_hash,key_length,key);
-                item._state._action=READ;
-                rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
+				key= reinterpret_cast<char*>(&_cluster_id);
+				key_length= sizeof(_cluster_id);
+				key_hash= hash(key, key_length);
+				uint64_t backend_list=0x1111111;
+				struct rte_ring_item item(key_hash,key_length,key);
+				rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
+				void* rev_item;
+				rev_item=get_value(_interface2worker[lcore_id]);
+				struct session_state* ses_state=nullptr;
 
-                void* rev_item;
-                rev_item=get_value(_interface2worker[lcore_id]);
-                if(rev_item==nullptr){
-                    //To do: drop this packet
-                    _drop=true;
-                    return;
-
-
-
-                }else{
-
-                    struct session_state* ses_state=&(((struct rte_ring_item*)rev_item)->_state);
-                    server=ses_state->_load_balancer_state._dst_ip_addr;
-
-                    //To do: send this packet to address server.
-                    iphdr->dst_addr=server;
-                    _drop=false;
-                    return;
-                }
+				if(rev_item==nullptr){
+					//backend list is empty
+					item._state._action=WRITE;
+					 item._state._load_balancer_state._backend_list=backend_list;
+					rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item));
+					void* rev_item;
+					rev_item=get_value(_interface2worker[lcore_id]);
 
 
-            }
+				}else{
+
+					ses_state=&(((struct rte_ring_item*)rev_item)->_state);
 
 
+					backend_list=ses_state->_load_balancer_state._backend_list;
+				}
+				form_list(backend_list);
 
+				server=next_server();
+
+				//generate key and write hash table
+				key= reinterpret_cast<char*>(&tuple);
+				key_length= sizeof(tuple);
+				key_hash= hash(key, key_length);
+				struct rte_ring_item item1(key_hash,key_length,key);
+				item1._state._action=WRITE;
+				item1._state._load_balancer_state._dst_ip_addr=server;
+				rte_ring_enqueue(_worker2interface[lcore_id],static_cast<void*>(&item1));
+
+				if(DEBUG==1)  printf("try to dequeue from _interface2worker[%d]\n",lcore_id);
+				rev_item=get_value(_interface2worker[lcore_id]);
+				if(DEBUG==1)  printf("dequeue from _interface2worker[%d] completed\n",lcore_id);
+
+
+				//To do:send packet to server
+				iphdr->dst_addr=server;
+				_drop=false;
+				return;
+
+
+			}else{
+
+				struct session_state* ses_state=&(((struct rte_ring_item*)rev_item)->_state);
+				server=ses_state->_load_balancer_state._dst_ip_addr;
+
+				//To do: send this packet to address server.
+				iphdr->dst_addr=server;
+				_drop=false;
+				return;
+			}
 
 
         }
