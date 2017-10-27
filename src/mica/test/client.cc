@@ -1167,6 +1167,7 @@ main(int argc, char **argv)
 
     uint64_t key_i;
     uint64_t key_hash;
+    uint64_t last_key_hash=0;
     size_t key_length = sizeof(key_i);
     char* key = reinterpret_cast<char*>(&key_i);
 
@@ -1195,6 +1196,14 @@ main(int argc, char **argv)
         bool is_get = op_r <= get_threshold;
 
         // Generate the key.
+        while (!client.can_request(last_key_hash) ||
+                sw.diff_in_cycles(now, last_handle_response_time) >=
+                response_check_interval) {
+            last_handle_response_time = now;
+            //printf("master handle_response now\n");
+            client.handle_response(rh);
+            //printf("master handle_response finished\n");
+        }
 
 
 
@@ -1205,9 +1214,6 @@ main(int argc, char **argv)
 
             //if(DEBUG==1)  printf("try to dequeue to _worker2interface[%d]\n",lcore_id);
             flag = rte_ring_sc_dequeue(worker2interface[lcore_id], dequeue_output);
-
-
-
             if(flag==0){
               //receive msg from workers
 
@@ -1248,6 +1254,7 @@ main(int argc, char **argv)
                 }else{
                 	if(DEBUG==1)	printf("unrecognized action: %d\n",rcv_state->_action);
                 }
+                last_key_hash=key_hash;
 
 
             }else{
