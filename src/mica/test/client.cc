@@ -1196,6 +1196,7 @@ main(int argc, char **argv)
         bool is_get = op_r <= get_threshold;
 
         // Generate the key.
+        uint64_t now = sw.now();
         while (!client.can_request(last_key_hash) ||
                 sw.diff_in_cycles(now, last_handle_response_time) >=
                 response_check_interval) {
