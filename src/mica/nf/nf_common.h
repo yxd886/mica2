@@ -78,6 +78,7 @@ class ResponseHandler
 	    	if(DEBUG==1) printf("received value's lcore_id: %d\n",hash_rcv_state->lcore_id);
 			struct rte_ring_item it(0,0,0,*hash_rcv_state);
 			if(DEBUG) printf("ips state: %d\n",it._state._ips_state._state);
+			if(DEBUG) printf("the usable size of _interface2worker[%d] is %d\n",hash_rcv_state->lcore_id,rte_ring_get_capacity(_interface2worker[hash_rcv_state->lcore_id]));
 			if(DEBUG==1) printf("try to enqueue to _interface2worker[%d]\n",hash_rcv_state->lcore_id);
 			rte_ring_enqueue(_interface2worker[hash_rcv_state->lcore_id],static_cast<void*>(&it));
 			if(DEBUG==1) printf("enqueue to _interface2worker[%d] completed\n",hash_rcv_state->lcore_id);
