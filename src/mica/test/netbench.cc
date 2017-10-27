@@ -1213,7 +1213,7 @@ main(int argc, char **argv)
 
     client.probe_reachability();
     std::map<uint64_t,uint64_t> lcore_map;
-    ResponseHandler rh(&lcore_map,worker2interface,interface2worker);
+    ResponseHandle rh(&lcore_map,worker2interface,interface2worker);
 
     size_t num_items = 192 * 1048576;
 
@@ -1251,6 +1251,7 @@ main(int argc, char **argv)
     stat._nat_state._dst_port=4399;
     value=reinterpret_cast<char*>(&stat);
     value_length=sizeof(stat);
+    key_hash= hash(key, key_length);
 
 
     client.set(key_hash, key, key_length, value, value_length, true);
