@@ -600,7 +600,7 @@ void DatagramClient<StaticConfig>::handle_response(ResponseHandler& rh) {
             stopwatch_.diff(now, thread_state.last_status_report);
         if (time_diff >= 1.) {
           thread_state.last_status_report = now;
-          report_status(time_diff);
+          //report_status(time_diff);
         }
       }
 
