@@ -1195,16 +1195,10 @@ main(int argc, char **argv)
         uint32_t op_r = op_type_rand.next_u32();
         bool is_get = op_r <= get_threshold;
 
-        // Generate the key.
-        uint64_t now = sw.now();
-        while (!client.can_request(last_key_hash) ||
-                sw.diff_in_cycles(now, last_handle_response_time) >=
-                response_check_interval) {
-            last_handle_response_time = now;
-            //printf("master handle_response now\n");
-            client.handle_response(rh);
-            //printf("master handle_response finished\n");
-        }
+
+		client.handle_response(rh);
+
+
 
 
 
@@ -1228,15 +1222,10 @@ main(int argc, char **argv)
                 if(DEBUG==1)	printf("size of session state:%d\n",sizeof(rcv_item->_state));
 
                 lcore_map[key_hash]=lcore_id;
-            	uint64_t now = sw.now();
-                while (!client.can_request(key_hash) ||
-                        sw.diff_in_cycles(now, last_handle_response_time) >=
-                        response_check_interval) {
-                    last_handle_response_time = now;
-                    //printf("master handle_response now\n");
-                    client.handle_response(rh);
-                    //printf("master handle_response finished\n");
-                }
+                while (!client.can_request(key_hash)) {
+
+                       }
+
 
                 if(rcv_state->_action==READ){
                     //get
